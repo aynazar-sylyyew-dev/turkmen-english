@@ -1,10 +1,15 @@
-import { THEORY_DATA } from "@/assets/data/theory_content";
 import { ThemedText } from "@/components/themed-text";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import { CHARACTERS } from "@/constants/CharacterAvatars";
+import { COURSE_DATA, isGradedQuestion } from "@/constants/CourseData";
 import { Colors, FontFamily, Radius, Shadow, Spacing } from "@/constants/theme";
 import { haptics } from "@/lib/haptics";
-import { getAllProgress } from "@/lib/lessonProgress";
+import { getChapterGradableCount } from "@/lib/courseSteps";
+import {
+  getCourseUnlocks,
+  isChapterComplete,
+  type ChapterUnlock,
+} from "@/lib/stepProgress";
 import { useStreak } from "@/lib/streak";
 import { useUserName } from "@/lib/user";
 import { useXP } from "@/lib/xp";
@@ -27,7 +32,7 @@ export default function ProfileScreen() {
   const { xp, refresh: refreshXP } = useXP();
   const streak = useStreak();
   const { name, refresh: refreshName, save: saveName } = useUserName();
-  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [courseMap, setCourseMap] = useState<ChapterUnlock[]>([]);
   const [renameOpen, setRenameOpen] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
 
@@ -36,7 +41,7 @@ export default function ProfileScreen() {
       refreshXP();
       streak.refresh();
       refreshName();
-      getAllProgress().then(setProgress);
+      getCourseUnlocks().then(setCourseMap);
     }, [refreshXP, streak, refreshName]),
   );
 
@@ -57,17 +62,20 @@ export default function ProfileScreen() {
     setRenameOpen(false);
   };
 
-  const completedChapterIds = new Set<number>();
-  Object.entries(progress).forEach(([key, count]) => {
-    if (count > 0 && key.startsWith("chapter-")) {
-      const n = Number(key.replace("chapter-", ""));
-      if (!isNaN(n)) completedChapterIds.add(n);
-    }
-  });
+  // Completion comes from the step engine — practice progress is per lesson,
+  // so there is no single storage key meaning "this chapter is done".
+  const completedChapterIds = new Set(
+    courseMap.filter(isChapterComplete).map((c) => c.chapterId),
+  );
 
-  const wordsLearned = Array.from(completedChapterIds).reduce((sum, id) => {
-    return sum + (THEORY_DATA[id]?.vocabulary?.length ?? 0);
-  }, 0);
+  const totalChapters = COURSE_DATA.chapters.length;
+  const totalExercises = COURSE_DATA.chapters
+    .flatMap((c) => c.lessons)
+    .flatMap((l) => l.questions)
+    .filter(isGradedQuestion).length;
+  const exercisesDone = courseMap
+    .filter(isChapterComplete)
+    .reduce((sum, c) => sum + getChapterGradableCount(c.chapterId), 0);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -80,7 +88,7 @@ export default function ProfileScreen() {
           <View style={styles.avatarOuter}>
             <View style={styles.avatarRing}>
               <Image
-                source={CHARACTERS.aman.source}
+                source={CHARACTERS.ahmet.source}
                 style={styles.avatarImg}
               />
             </View>
@@ -100,7 +108,7 @@ export default function ProfileScreen() {
             />
           </Pressable>
           <ThemedText style={styles.heroSubtitle}>
-            Hytaý dilini öwrenýär
+            Iňlis dilini öwrenýär
           </ThemedText>
         </View>
 
@@ -163,32 +171,32 @@ export default function ProfileScreen() {
                 style={[
                   styles.statBarFill,
                   {
-                    width: `${(completedChapterIds.size / 30) * 100}%`,
+                    width: `${(completedChapterIds.size / totalChapters) * 100}%`,
                     backgroundColor: Colors.primaryAccentColor,
                   },
                 ]}
               />
             </View>
             <ThemedText style={styles.statSubtle}>
-              {completedChapterIds.size} / 30
+              {completedChapterIds.size} / {totalChapters}
             </ThemedText>
           </View>
 
           <View style={styles.statBox}>
-            <AnimatedCounter value={wordsLearned} style={styles.statValue} />
-            <ThemedText style={styles.statLabel}>sözler</ThemedText>
+            <AnimatedCounter value={exercisesDone} style={styles.statValue} />
+            <ThemedText style={styles.statLabel}>gönükmeler</ThemedText>
             <View style={styles.statBar}>
               <View
                 style={[
                   styles.statBarFill,
                   {
-                    width: `${Math.min((wordsLearned / 600) * 100, 100)}%`,
+                    width: `${Math.min((exercisesDone / totalExercises) * 100, 100)}%`,
                     backgroundColor: Colors.successColor,
                   },
                 ]}
               />
             </View>
-            <ThemedText style={styles.statSubtle}>~600</ThemedText>
+            <ThemedText style={styles.statSubtle}>{totalExercises}</ThemedText>
           </View>
         </View>
 
@@ -210,9 +218,9 @@ export default function ProfileScreen() {
             />
             <MenuItem
               icon="language-outline"
-              title="Hytaý dili hakynda"
-              subtitle="Mandarin, tonlar, pinýin"
-              onPress={() => router.push("/about-chinese")}
+              title="Iňlis dili hakynda"
+              subtitle="Elipbiý, grammatika, maslahatlar"
+              onPress={() => router.push("/about-english")}
             />
             <MenuItem
               icon="person-circle-outline"

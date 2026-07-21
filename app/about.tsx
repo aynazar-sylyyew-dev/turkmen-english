@@ -4,6 +4,7 @@ import { haptics } from "@/lib/haptics";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { T } from "@/lib/strings";
 import Constants from "expo-constants";
+import { COURSE_DATA, isGradedQuestion } from "@/constants/CourseData";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -24,8 +25,21 @@ const SHAPAK_LOGO = require("../assets/images/shapak_logo.png");
 const APP_VERSION =
   Constants.expoConfig?.version ?? Constants.manifest?.version ?? "1.0.0";
 
-const APP_NAME = "Hytaý dili 1";
+// Read from the manifest so the name can never drift from app.json.
+const APP_NAME = Constants.expoConfig?.name ?? "Iňlis dili 1";
 const TEAM_EMAIL = "shapak.app@gmail.com";
+
+// Course size is read from the data so these claims cannot go stale.
+const CHAPTER_COUNT = COURSE_DATA.chapters.length;
+const LESSON_COUNT = COURSE_DATA.chapters.reduce(
+  (n, c) => n + c.lessons.length,
+  0,
+);
+const ALL_QUESTIONS = COURSE_DATA.chapters.flatMap((c) =>
+  c.lessons.flatMap((l) => l.questions),
+);
+const EXERCISE_COUNT = ALL_QUESTIONS.filter(isGradedQuestion).length;
+const THEORY_COUNT = ALL_QUESTIONS.filter((q) => q.type === "theory").length;
 const YEAR = new Date().getFullYear();
 
 type ModalType = "authors" | "series" | null;
@@ -157,17 +171,17 @@ export default function AboutScreen() {
                 {"\n\n"}
                 Biziň maksadymyz — Türkmenistanyň ilatyna daşary ýurt dillerini
                 öwrenmegi has aňsat we elýeterli etmekdir. Bu programma serimiziň
-                ikinji programmasy bolup, hytaý diline bagyşlanan.
+                üçünji programmasy bolup, iňlis diline bagyşlanan.
               </ThemedText>
             </Section>
 
             {/* Features */}
             <Section icon="apps" color={Colors.warningColor} title="Mümkinçilikler">
-              <FeatureRow icon="book" text="Boya Chinese kitaby boýunça 31 bap" />
-              <FeatureRow icon="checkbox" text="600+ gönükme (8 dürli görnüş)" />
-              <FeatureRow icon="brush" text="Hiýeroglif ýazuwy (768 oflaýn)" />
-              <FeatureRow icon="volume-high" text="1632 pinýin ses faýly" />
-              <FeatureRow icon="chatbubbles" text="Auto-play dialoglar" />
+              <FeatureRow icon="book" text={`Grammatika boýunça ${CHAPTER_COUNT} bap, ${LESSON_COUNT} sapak`} />
+              <FeatureRow icon="checkbox" text={`${EXERCISE_COUNT} gönükme (8 dürli görnüş)`} />
+              <FeatureRow icon="create" text="Ýazuw gönükmeleri — jogaby özüň ýaz" />
+              <FeatureRow icon="volume-high" text="Sözleriň aýdylyşy we diktant" />
+              <FeatureRow icon="school" text={`${THEORY_COUNT} düşündiriş sapaklaryň içinde`} />
               <FeatureRow icon="trophy" text="XP we Streak sistemasy" />
             </Section>
 
@@ -200,8 +214,7 @@ export default function AboutScreen() {
               <ThemedText style={styles.sectionText}>
                 Programma MIT lisenziýasy bilen açyk çeşmäni esas alýar.
                 {"\n\n"}
-                Mazmun çeşmeleri: Boya Chinese Elementary I (Peking University
-                Press), Twemoji (CC-BY 4.0), Inter şrift (OFL).
+                Mazmun çeşmeleri: Twemoji (CC-BY 4.0), Inter şrift (OFL).
               </ThemedText>
             </Section>
           </ScrollView>
@@ -273,9 +286,9 @@ export default function AboutScreen() {
               highlight
             >
               <ThemedText style={styles.sectionText}>
-                Häzirki programma — hytaý dilini öwretmek üçin doly kurs. Boya
-                Chinese kitaby boýunça 31 bap, 600+ gönükme, hiýeroglif ýazuwy,
-                pinýin sesleri.
+                Häzirki programma — iňlis dilini öwretmek üçin doly kurs:
+                grammatika boýunça {CHAPTER_COUNT} bap, {LESSON_COUNT} sapak we
+                {" "}{EXERCISE_COUNT} gönükme.
               </ThemedText>
             </Section>
 

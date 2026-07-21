@@ -181,6 +181,16 @@ export interface ChapterUnlock {
 }
 
 /**
+ * Has the learner finished this chapter?
+ *
+ * Screens must ask the step engine rather than counting AsyncStorage keys:
+ * practice progress is stored per LESSON, and a chapter carries several of
+ * them, so there is no single key that means "chapter done".
+ */
+export const isChapterComplete = (chapter: ChapterUnlock): boolean =>
+  chapter.passed || (chapter.total > 0 && chapter.doneCount === chapter.total);
+
+/**
  * Сводка по всем главам для карты прогресса на главном: разблокировка
  * (кросс-главный гейтинг) + сколько шагов сдано в каждой главе.
  */

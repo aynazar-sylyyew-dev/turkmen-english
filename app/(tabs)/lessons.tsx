@@ -1,12 +1,15 @@
-import { THEORY_DATA } from "@/assets/data/theory_content";
 import { ThemedText } from "@/components/themed-text";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import { CHARACTERS } from "@/constants/CharacterAvatars";
 import { COURSE_DATA } from "@/constants/CourseData";
 import { Colors, FontFamily, Radius, Shadow, Spacing } from "@/constants/theme";
 import { haptics } from "@/lib/haptics";
-import { getAllProgress } from "@/lib/lessonProgress";
-import { ChapterUnlock, getCourseUnlocks } from "@/lib/stepProgress";
+import { getChapterGradableCount } from "@/lib/courseSteps";
+import {
+  getCourseUnlocks,
+  isChapterComplete,
+  type ChapterUnlock,
+} from "@/lib/stepProgress";
 import { useStreak } from "@/lib/streak";
 import { useUserName } from "@/lib/user";
 import { useXP } from "@/lib/xp";
@@ -31,11 +34,7 @@ function getGreeting(name: string | null): string {
 function getNextChapter(completedIds: Set<number>): { id: number; title: string; target: string } {
   for (const ch of COURSE_DATA.chapters) {
     if (!completedIds.has(ch.id)) {
-      const theory = THEORY_DATA[ch.id];
-      const firstTarget = theory?.vocabulary?.[0]?.target ?? ch.title.split(" ")[0];
-      const titleParts = ch.title.split(" — ");
-      const cleanTitle = titleParts[1] ?? titleParts[0];
-      return { id: ch.id, title: cleanTitle, target: firstTarget };
+      return { id: ch.id, title: ch.title, target: String(ch.id) };
     }
   }
   // All done — show the last chapter as a celebration.
@@ -112,7 +111,6 @@ function CourseMap({
 }
 
 export default function LessonsContent() {
-  const [progress, setProgress] = useState<Record<string, number>>({});
   const [courseMap, setCourseMap] = useState<ChapterUnlock[]>([]);
   const { xp, refresh: refreshXP } = useXP();
   const streak = useStreak();
@@ -120,7 +118,6 @@ export default function LessonsContent() {
 
   useFocusEffect(
     useCallback(() => {
-      getAllProgress().then(setProgress);
       getCourseUnlocks().then(setCourseMap);
       refreshXP();
       streak.refresh();
@@ -128,17 +125,16 @@ export default function LessonsContent() {
     }, [refreshXP, streak, refreshName]),
   );
 
-  const completedChapterIds = new Set<number>();
-  Object.entries(progress).forEach(([key, count]) => {
-    if (count > 0 && key.startsWith("chapter-")) {
-      const n = Number(key.replace("chapter-", ""));
-      if (!isNaN(n)) completedChapterIds.add(n);
-    }
-  });
+  // The step engine owns completion: practice progress is recorded per lesson,
+  // so no single storage key means "this chapter is done".
+  const completedChapterIds = new Set(
+    courseMap.filter(isChapterComplete).map((c) => c.chapterId),
+  );
 
-  const wordsLearned = Array.from(completedChapterIds).reduce((sum, id) => {
-    return sum + (THEORY_DATA[id]?.vocabulary?.length ?? 0);
-  }, 0);
+  // Exercises actually answered, across every finished chapter.
+  const exercisesDone = courseMap
+    .filter(isChapterComplete)
+    .reduce((sum, c) => sum + getChapterGradableCount(c.chapterId), 0);
 
   const next = getNextChapter(completedChapterIds);
   const greeting = getGreeting(name);
@@ -155,11 +151,11 @@ export default function LessonsContent() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero with Aman */}
+        {/* Hero with the mascot */}
         <View style={styles.heroBlock}>
-          <View style={styles.amanRow}>
-            <View style={styles.amanAvatar}>
-              <Image source={CHARACTERS.aman.source} style={styles.amanImg} />
+          <View style={styles.mascotRow}>
+            <View style={styles.mascotAvatar}>
+              <Image source={CHARACTERS.ahmet.source} style={styles.mascotImg} />
             </View>
             <View style={styles.speechBubble}>
               <View style={styles.bubbleTail} />
@@ -207,12 +203,15 @@ export default function LessonsContent() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statChip}>
-            <AnimatedCounter value={wordsLearned} style={styles.statValue} />
-            <ThemedText style={styles.statLabel}>söz öwrenildi</ThemedText>
+            <AnimatedCounter value={exercisesDone} style={styles.statValue} />
+            <ThemedText style={styles.statLabel}>gönükme geçildi</ThemedText>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statChip}>
-            <AnimatedCounter value={30 - completedChapterIds.size} style={styles.statValue} />
+            <AnimatedCounter
+              value={COURSE_DATA.chapters.length - completedChapterIds.size}
+              style={styles.statValue}
+            />
             <ThemedText style={styles.statLabel}>galdy</ThemedText>
           </View>
         </View>
@@ -265,7 +264,9 @@ export default function LessonsContent() {
               <Ionicons name="book-outline" size={22} color={Colors.primaryAccentColor} />
             </View>
             <ThemedText style={styles.quickTitle}>Sapaklar</ThemedText>
-            <ThemedText style={styles.quickSubtitle}>1–30</ThemedText>
+            <ThemedText style={styles.quickSubtitle}>
+              1–{COURSE_DATA.chapters.length}
+            </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -338,13 +339,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 20,
   },
-  amanRow: {
+  mascotRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     marginBottom: 14,
   },
-  amanAvatar: {
+  mascotAvatar: {
     width: 72,
     height: 72,
     borderRadius: 36,
@@ -355,7 +356,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden",
   },
-  amanImg: { width: "100%", height: "100%", resizeMode: "cover" },
+  mascotImg: { width: "100%", height: "100%", resizeMode: "cover" },
   speechBubble: {
     flex: 1,
     backgroundColor: Colors.surfaceSecondary,

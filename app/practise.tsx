@@ -92,7 +92,7 @@ export default function PractiseScreen() {
         <BackHeader title="Gönükmeler" />
         <View style={styles.placeholder}>
           <View style={styles.placeholderAvatar}>
-            <Image source={CHARACTERS.aman.source} style={styles.placeholderImg} />
+            <Image source={CHARACTERS.ahmet.source} style={styles.placeholderImg} />
           </View>
           <ThemedText style={styles.placeholderTitle}>Gönükmeler taýýarlanýar</ThemedText>
           <ThemedText style={styles.placeholderText}>

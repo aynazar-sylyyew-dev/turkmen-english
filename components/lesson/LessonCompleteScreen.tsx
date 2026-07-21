@@ -89,8 +89,8 @@ export default function LessonCompleteScreen({
             { transform: [{ scale: scaleAnim }], opacity: fadeAnim },
           ]}
         >
-          <View style={styles.amanCircle}>
-            <Image source={CHARACTERS.aman.source} style={styles.amanImg} />
+          <View style={styles.mascotCircle}>
+            <Image source={CHARACTERS.ahmet.source} style={styles.mascotImg} />
             <View style={styles.trophyBadge}>
               <Ionicons name="trophy" size={22} color={Colors.textInverse} />
             </View>
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
   },
-  amanCircle: {
+  mascotCircle: {
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 6,
   },
-  amanImg: {
+  mascotImg: {
     width: "100%",
     height: "100%",
     borderRadius: 60,

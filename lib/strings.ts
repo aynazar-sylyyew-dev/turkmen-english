@@ -49,6 +49,10 @@ export const T = {
   },
 
   // Шаги главы (Stepik-лента)
+  chapters: {
+    lessonCount: (n: number) => `${n} sapak`,
+  },
+
   steps: {
     // Лейблы по subtype шага (lookup: T.steps.labels[step.subtype])
     labels: {
@@ -94,6 +98,7 @@ export const T = {
   // Упражнения со свободным вводом и шаги без оценки
   freeText: {
     placeholder: "Jogabyňy ýaz…",
+    listen: "Diňle",
     correct: "Dogry!",
     incorrect: "Dogry jogap:",
     readingPassage: "Tekst",
@@ -163,6 +168,10 @@ export const T = {
     title: "Sözlem derňewi",
     tapWordForMeaning: "Manysyny görmek üçin islendik söze bas",
     breakdownLabel: "Derňew:",
+    targetLabel: "Sözlem:",
+    transliterationLabel: "Aýdylyşy:",
+    translationLabel: "Terjimesi:",
+    swipeForHelp: "Doly kömek üçin ýokary süýşür",
   },
 
   // Диалог подтверждения выхода из упражнения (ConfirmDialog в LessonContent)

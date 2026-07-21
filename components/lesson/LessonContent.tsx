@@ -568,6 +568,7 @@ export default function LessonContent({
             passage={currentQuestion.sentence}
             answer={currentQuestion.correctAnswer}
             acceptableAnswers={currentQuestion.acceptableAnswers}
+            audioText={currentQuestion.audioText}
             hint={currentQuestion.hint}
             explanation={currentQuestion.explanation}
             onAnswer={handleSelfContainedAnswer}

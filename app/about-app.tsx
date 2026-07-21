@@ -1,4 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
+import { COURSE_DATA, isGradedQuestion } from "@/constants/CourseData";
 import { Colors, FontFamily } from "@/constants/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { T } from "@/lib/strings";
@@ -16,6 +17,19 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+// Everything this manual claims about the course size is read from the course
+// itself, so the numbers cannot drift the way the previous hardcoded ones did.
+const CHAPTER_COUNT = COURSE_DATA.chapters.length;
+const LESSON_COUNT = COURSE_DATA.chapters.reduce(
+  (n, c) => n + c.lessons.length,
+  0,
+);
+const ALL_QUESTIONS = COURSE_DATA.chapters.flatMap((c) =>
+  c.lessons.flatMap((l) => l.questions),
+);
+const EXERCISE_COUNT = ALL_QUESTIONS.filter(isGradedQuestion).length;
+const THEORY_COUNT = ALL_QUESTIONS.filter((q) => q.type === "theory").length;
 
 function PageWrapper({
   label,
@@ -77,31 +91,31 @@ function WelcomePage() {
   return (
     <PageWrapper label="Salam" title="Programma hakynda">
       <ThemedText style={styles.body}>
-        Bu programma türkmen dilinde gepleýänler üçin hytaý dilini öwretmek üçin döredildi. Maksadymyz — sada we düşnükli ýol bilen başlangyç derejäni özleşdirmek.
+        Bu programma türkmen dilinde gepleýänler üçin iňlis dilini öwretmek üçin döredildi. Maksadymyz — sada we düşnükli ýol bilen başlangyç derejäni özleşdirmek.
       </ThemedText>
       <ThemedText style={styles.body}>
-        Programma esasan oflaýn işleýär — sözlükler, grammatika, gönükmeler we hiýeroglifler telefonyňyzda saklanýar. Diňe aýdylyş seslerini diňlemek üçin internet gerek bolup biler.
+        Programma doly oflaýn işleýär — grammatika, gönükmeler we düşündirişler telefonyňyzda saklanýar. Internet gerek däl.
       </ThemedText>
       <View style={styles.statsRow}>
         <View style={styles.statBox}>
-          <ThemedText style={styles.statValue}>31</ThemedText>
+          <ThemedText style={styles.statValue}>{CHAPTER_COUNT}</ThemedText>
           <ThemedText style={styles.statLabel}>bap</ThemedText>
         </View>
         <View style={styles.statBox}>
-          <ThemedText style={styles.statValue}>600+</ThemedText>
+          <ThemedText style={styles.statValue}>{LESSON_COUNT}</ThemedText>
+          <ThemedText style={styles.statLabel}>sapak</ThemedText>
+        </View>
+        <View style={styles.statBox}>
+          <ThemedText style={styles.statValue}>{EXERCISE_COUNT}</ThemedText>
           <ThemedText style={styles.statLabel}>gönükme</ThemedText>
         </View>
         <View style={styles.statBox}>
-          <ThemedText style={styles.statValue}>768</ThemedText>
-          <ThemedText style={styles.statLabel}>hiýeroglif</ThemedText>
-        </View>
-        <View style={styles.statBox}>
-          <ThemedText style={styles.statValue}>1632</ThemedText>
-          <ThemedText style={styles.statLabel}>pinýin sesi</ThemedText>
+          <ThemedText style={styles.statValue}>{THEORY_COUNT}</ThemedText>
+          <ThemedText style={styles.statLabel}>düşündiriş</ThemedText>
         </View>
       </View>
       <ThemedText style={styles.body}>
-        Esasy pelsepe: ilki teoriýa (sözler, grammatika, dialoglar), soň gönükmeler, soň synag. Ýalňyşlyk — öwrenmegiň bir bölegi, basyşsyz, asuda öwreniň.
+        Esasy pelsepe: gysga düşündiriş, soň şol bada gönükme, bapyň soňunda synag. Ýalňyşlyk — öwrenmegiň bir bölegi, basyşsyz, asuda öwreniň.
       </ThemedText>
     </PageWrapper>
   );
@@ -111,23 +125,23 @@ function MainScreenPage() {
   return (
     <PageWrapper label="Esasy ekran" title="Üç plitka">
       <ThemedText style={styles.body}>
-        Programmany açanyňyzda «Hytaý dilini öwreniň» ekrany peýda bolar. Onda üç plitka bar:
+        Programmany açanyňyzda «Iňlis dilini öwreniň» ekrany peýda bolar. Onda üç plitka bar:
       </ThemedText>
 
       <FeatureCard
         icon="hand-left-outline"
         title="Hoş geldiňiz"
-        desc="Programma hakynda we hytaý dili hakynda umumy maglumat. Täze öwrenip başlaýanlar üçin başlangyç nokat."
+        desc="Programma hakynda we iňlis dili hakynda umumy maglumat. Täze öwrenip başlaýanlar üçin başlangyç nokat."
       />
       <FeatureCard
         icon="book-outline"
         title="Sapaklar"
-        desc="31 bapyň doly sanawy. Her bap üçin teoriýa, gönükmeler we synag bar."
+        desc={`${CHAPTER_COUNT} bapyň doly sanawy. Her bapda dört sapak we bir synag bar.`}
       />
       <FeatureCard
         icon="settings-outline"
         title="Sazlamalar"
-        desc="Hiýeroglif ýazuwynyň gatylygy, kömek, režim. Şahsy tertibiňize sazlap bolýar."
+        desc="Gündelik ýatlatmalar we maglumatlaryň ätiýaçlyk nusgasy."
       />
 
       <ThemedText style={styles.body}>
@@ -139,34 +153,20 @@ function MainScreenPage() {
 
 function ChaptersPage() {
   return (
-    <PageWrapper label="Sapaklar" title="31 bap">
+    <PageWrapper label="Sapaklar" title={`${CHAPTER_COUNT} bap`}>
       <ThemedText style={styles.body}>
-        Sapaklar Boya Chinese Elementary I okuw kitabynyň gurluşy boýunça düzüldi. Her bap belli bir tema bagyşlanan: salamlaşmak, ýaşaýyş, wagt, maşgala, söwda we beýlekiler.
+        Her bap bir grammatik tema bagyşlanan: köplük sany, artikller, zamanlar, deňeşdirme we beýlekiler. Baplar aňsatdan kyna tarap gidýär.
       </ThemedText>
 
       <View style={styles.chapterCard}>
-        <ThemedText style={styles.chapterBadge}>0-njy bap</ThemedText>
-        <View style={styles.chapterContent}>
-          <ThemedText style={styles.chapterTitle}>Aýdylyşy (语音)</ThemedText>
-          <ThemedText style={styles.chapterDesc}>
-            Pinýin, tonlar, başlangyç we soňlangyç sesler. Diňe teoriýa, 1632 ses faýly bilen.
-          </ThemedText>
-        </View>
-      </View>
-
-      <View style={styles.chapterCard}>
-        <ThemedText style={styles.chapterBadge2}>1-30 bap</ThemedText>
+        <ThemedText style={styles.chapterBadge2}>{`1-${CHAPTER_COUNT} bap`}</ThemedText>
         <View style={styles.chapterContent}>
           <ThemedText style={styles.chapterTitle}>Esasy sapaklar</ThemedText>
           <ThemedText style={styles.chapterDesc}>
-            Her bapda 17-22 täze söz, 3-4 grammatika düzgüni, 1-2 dialog we 20 gönükme. Üç bölüm: Teoriýa / Gönükmeler / Bap synagy.
+            Her bapda dört sapak we bapyň soňunda synag. Sapagyň içinde gysga düşündirişler gönükmeler bilen gezekleşýär.
           </ThemedText>
         </View>
       </View>
-
-      <ThemedText style={styles.body}>
-        Dialoglardaky personajlar — Aman (Türkmenistandan gelen student), Gulnara (Kanadaly student), Çžan Weý we mugallymlar. Olaryň üsti bilen gündelik durmuşda ulanylýan diller öwrenilýär.
-      </ThemedText>
 
       <ThemedText style={styles.body}>
         Sapaklary tertibinde geçmek maslahat berilýär — her soňraky bap öňküleriň üstüne gurulýar.
@@ -175,41 +175,36 @@ function ChaptersPage() {
   );
 }
 
-function TheoryPage() {
+function LessonFlowPage() {
   return (
-    <PageWrapper label="Teoriýa" title="Sapagyň materialy">
+    <PageWrapper label="Sapak" title="Sapak nähili gidýär">
       <ThemedText style={styles.body}>
-        Teoriýa ekrany sahypadan-sahypa süýşürilýär (swipe). Her sahypa aýratyn bir bölüme bagyşlanan:
+        Sapak ädimme-ädim geçilýär. Teoriýa aýratyn ýerde durmaýar — ol gönükmeleriň arasynda gysga bloklar bolup gelýär:
       </ThemedText>
 
       <StepRow
         n="1"
-        title="Giriş"
-        desc="Bapda kim, näme öwreniljekdigi hakda gysga maglumat."
+        title="Düşündiriş"
+        desc="Bir düzgün, mysallar bilen. Okap, «Dowam et» basýarsyň. Baha berilmeýär."
       />
       <StepRow
         n="2"
-        title="Täze sözler"
-        desc="17-22 söz: hiýeroglif + pinýin + türkmen/rus terjimesi. 🖌️ basyň — hiýeroglifiň näçe gezek ýazylýandygy animasiýa bilen görkeziler."
+        title="Gönükmeler"
+        desc="Şol bada şol düzgüne maşk: saýla, doldur, sözlemi üýtget, jübütle."
       />
       <StepRow
         n="3"
-        title="Grammatika"
-        desc="Her düzgün aýratyn sahypada: düşündirişi we mysallary."
+        title="Ýazuw"
+        desc="Erkin ýazmak üçin ýumuş. Iň az söz sany talap edilýär, ýöne baha berilmeýär."
       />
       <StepRow
         n="4"
-        title="Dialoglar"
-        desc="Hytaýça tekstler, pinýin we terjime. Diňläp, gaýtalap öwreniň."
-      />
-      <StepRow
-        n="5"
-        title="Maslahatlar"
-        desc="Bapy ýatda saklamak we ulanmak boýunça birnäçe maslahat."
+        title="Netije"
+        desc="Sapagyň soňunda dogry jogaplaryň sany, XP we ýalňyşlaryň sanawy görkezilýär."
       />
 
       <ThemedText style={styles.body}>
-        Aşaky panelde «Yza» / «Öňe» düwmeleri, sahypa belgisi (3/7 ýaly) we nokat-görkezijiler bar. Sahypany islän tertipde okap bilersiňiz.
+        Aşaky panelde her ädimiň belgisi bar — basyp yzyna ýa-da öňe böküp bolýar.
       </ThemedText>
     </PageWrapper>
   );
@@ -217,25 +212,30 @@ function TheoryPage() {
 
 function ExercisesPage() {
   return (
-    <PageWrapper label="Gönükmeler" title="Üç ugurly menýu">
+    <PageWrapper label="Gönükmeler" title="Sekiz görnüş">
       <ThemedText style={styles.body}>
-        «Gönükmeler» bölümini açanyňyzda menýu peýda bolar. Üç saýlaw bar:
+        Kursda sekiz görnüşli gönükme bar. Olaryň bir bölegi saýlamak, bir bölegi ýazmak bilen çözülýär:
       </ThemedText>
 
       <FeatureCard
-        icon="library-outline"
-        title="Sapagyň sözleri"
-        desc="Sapakdaky ähli sözleri kart görnüşinde gaýtalamak. Gönükmelere geçmezden öň sözlügi pugtalandyrmak üçin."
-      />
-      <FeatureCard
         icon="checkbox-outline"
-        title="Gönükmelere geç"
-        desc="Sekiz görnüşli 20 gönükme: kart, saýlaw, diňle, doldur, jübütle, grammatika, jogap, hiýeroglif. Aşakda her gönükmäniň belgisi (1-20) bar — basyp böküp bolýar."
+        title="Saýlama we artykmajyny tap"
+        desc="Birnäçe warianty berilýär, dogrusyny saýlaýarsyň."
       />
       <FeatureCard
-        icon="brush-outline"
-        title="Hiýerogliflerini ýaz"
-        desc="Bapdaky ähli hiýeroglifleri barmak bilen ýazmak. Her hiýeroglif aýratyn karta — basanyňda ýazuw režimi açylar."
+        icon="create-outline"
+        title="Boşluk doldurma we sözlemi üýtgetmek"
+        desc="Jogaby özüň ýazýarsyň. Baş harp, artykmaç boşluk we soňky nokat hasaba alynmaýar."
+      />
+      <FeatureCard
+        icon="volume-high-outline"
+        title="Diktant"
+        desc="Söz diňe sesli aýdylýar — diňläp, ýazmaly. Söz ekranda görkezilmeýär."
+      />
+      <FeatureCard
+        icon="book-outline"
+        title="Okamak we jübütlemek"
+        desc="Tekst boýunça sorag, ýa-da çep we sag sütünleri baglamak."
       />
 
       <ThemedText style={styles.body}>
@@ -245,34 +245,32 @@ function ExercisesPage() {
   );
 }
 
-function TestAndStrokePage() {
+function TestPage() {
   return (
-    <PageWrapper label="Synag we ýazuw" title="Bap synagy we hiýeroglif">
+    <PageWrapper label="Synag" title="Bap synagy">
       <View style={styles.bigBlock}>
         <View style={styles.bigBlockHeader}>
           <Ionicons name="checkmark-done-outline" size={24} color={Colors.primaryAccentColor} />
-          <ThemedText style={styles.bigBlockTitle}>Bap synagy</ThemedText>
+          <ThemedText style={styles.bigBlockTitle}>Nähili işleýär</ThemedText>
         </View>
         <ThemedText style={styles.bigBlockBody}>
-          Sapakda ähli zady öwrenip bolanyňyzdan soň özüňizi barlap bilersiňiz. Bapyň 20 gönükmesinden 15-si tötänleýin saýlanýar.
+          Bapyň dört sapagyny geçeniňden soň synag açylýar. Bapdaky gönükmelerden 15-si tötänleýin saýlanýar.
         </ThemedText>
         <ThemedText style={styles.bigBlockBody}>
-          Synagy birnäçe gezek geçip bilersiňiz — her gezek başgaça soraglar düşer. Sözleri we grammatikany berkitmek üçin amatly.
+          Geçmek üçin 70% gerek. Bir gezek geçseň, netije saklanýar — soň gaýtadan synanyşsaň hem ýitmeýär.
         </ThemedText>
       </View>
 
       <View style={styles.bigBlock}>
         <View style={styles.bigBlockHeader}>
-          <Ionicons name="brush-outline" size={24} color={Colors.primaryAccentColor} />
-          <ThemedText style={styles.bigBlockTitle}>Hiýeroglif ýazuwy</ThemedText>
+          <Ionicons name="lock-open-outline" size={24} color={Colors.primaryAccentColor} />
+          <ThemedText style={styles.bigBlockTitle}>Indiki bap</ThemedText>
         </View>
         <ThemedText style={styles.bigBlockBody}>
-          Iki ýerde ulanylýar:
+          Indiki bap diňe synagy tabşyranyňdan soň açylýar. Şeýdip grammatika yzygiderli, boşluksyz öwrenilýär.
         </ThemedText>
-        <ThemedText style={styles.listItem}>• Teoriýada — sözüň ýanyndaky 🖌️ basyň, hiýeroglifiň ýazylyşy animasiýa bilen görkeziler.</ThemedText>
-        <ThemedText style={styles.listItem}>• Gönükmelerde — barmak bilen ekranda çyzýarsyňyz, her zarbany dogry tertipde.</ThemedText>
         <ThemedText style={styles.bigBlockBody}>
-          768 hiýeroglif programmanyň içinde saklanýar — internet gerek däl.
+          Düşündiriş we ýazuw ädimleri synaga girmeýär — olara baha berilmeýär.
         </ThemedText>
       </View>
     </PageWrapper>
@@ -283,36 +281,23 @@ function SettingsPage() {
   return (
     <PageWrapper label="Sazlamalar" title="Şahsy tertibi sazlaň">
       <ThemedText style={styles.body}>
-        Hiýeroglif ýazuwynyň gatylygyny we kömek görnüşini şahsy gerekligiňize görä üýtgedip bolýar. «Sazlamalar» plitkasy esasy ekrandan açylýar.
+        «Sazlamalar» plitkasy esasy ekrandan açylýar. Ol ýerde iki zat bar.
       </ThemedText>
 
       <View style={styles.settingCard}>
-        <ThemedText style={styles.settingTitle}>Gatylyk</ThemedText>
+        <ThemedText style={styles.settingTitle}>Gündelik ýatlatma</ThemedText>
         <ThemedText style={styles.settingDesc}>
-          Çyzgynyň takyklygyna näçe ýumşak garamaly:
+          Her gün agşam telefonyňa ýatlatma gelýär, streagyňy dowam etmegi ýatladýar. Islemeseň öçürip bolýar.
         </ThemedText>
-        <ThemedText style={styles.listItem}>• Aňsat — başlaýanlar üçin, kiçi ýalňyşlyklara ýol berýär</ThemedText>
-        <ThemedText style={styles.listItem}>• Orta — adaty derejä</ThemedText>
-        <ThemedText style={styles.listItem}>• Kyn — takyk çyzgy talap edýär</ThemedText>
       </View>
 
       <View style={styles.settingCard}>
-        <ThemedText style={styles.settingTitle}>Kömek görkez</ThemedText>
+        <ThemedText style={styles.settingTitle}>Ätiýaçlyk nusgasy</ThemedText>
         <ThemedText style={styles.settingDesc}>
-          Näçe ýalňyşdan soň kömek (indiki zarbanyň ýolunyň çyzygy) görkezilsin:
+          Ähli öňegidişligiňi bir faýla ýazdyryp, soň şol faýldan dikeldip bolýar. Telefon çalşanyňda peýdaly.
         </ThemedText>
-        <ThemedText style={styles.listItem}>• 3 ýalňyşdan soň</ThemedText>
-        <ThemedText style={styles.listItem}>• 5 ýalňyşdan soň</ThemedText>
-        <ThemedText style={styles.listItem}>• Görkezme — kömek hiç haçan görkezilmesin</ThemedText>
-      </View>
-
-      <View style={styles.settingCard}>
-        <ThemedText style={styles.settingTitle}>Režim</ThemedText>
-        <ThemedText style={styles.settingDesc}>
-          Ýalňyşlyk näçe gymmat:
-        </ThemedText>
-        <ThemedText style={styles.listItem}>• Öwrenmek — ýalňyşlyklar päsgel bermeýär, dowam edip bilersiňiz</ThemedText>
-        <ThemedText style={styles.listItem}>• Synag — köp ýalňyş = synap gaýtadan başlamaly</ThemedText>
+        <ThemedText style={styles.listItem}>• Ýatda sakla — faýly döredýär we paýlaşýar</ThemedText>
+        <ThemedText style={styles.listItem}>• Yzyna ýükle — faýldan öňegidişligi dikeldýär</ThemedText>
       </View>
     </PageWrapper>
   );
@@ -325,13 +310,13 @@ function TipsPage() {
         Her gün azajyk geçiň — günde 10-15 minut köp ýagdaýy birden 2 sagatdan has peýdaly. Yzygiderlik beýnä iň gowusy.
       </ThemedText>
       <ThemedText style={styles.tipItem}>
-        Ses bilen gaýtalaň. Diňe okamak ýeterlik däl — hytaýça ses bilen aýdyň, beýniňiz tonlary we ahangy hakydyna alar.
+        Ses bilen gaýtalaň. Diňe okamak ýeterlik däl — sözi eşidip, özüňiz hem sesli aýdyň, şonda has gowy ýatda galýar.
       </ThemedText>
       <ThemedText style={styles.tipItem}>
-        Tonlara üns beriň. Bir we şol bir ses dürli tonda dürli many berýär. Ilkibada kyn, soň özbaşdak gelýär.
+        Söz tertibine üns beriň. Iňlis dilinde eýe — işlik — doldurgyç tertibi berk, ony üýtgetmek manyny bozýar.
       </ThemedText>
       <ThemedText style={styles.tipItem}>
-        Hiýeroglifleri tertibinde ýazyň. Zarbalaryň dogry tertibi okamak we ýatda saklamak üçin möhüm.
+        Nädogry işlikleri toparlap öwreniň. go → went, see → saw ýaly sanawlary birbada däl-de, bölek-bölek ýat tutuň.
       </ThemedText>
       <ThemedText style={styles.tipItem}>
         Ýalňyşlykdan gorkmaň. Her ýalňyş — öwrenmegiň bir bölegi. Gönükmäni täzeden geçip bilersiňiz.
@@ -340,7 +325,7 @@ function TipsPage() {
         Bap synagyny birnäçe gezek geçiň. Her gezek başga soraglar düşýär — pugta ýatda saklamak üçin iň oňat usul.
       </ThemedText>
       <ThemedText style={styles.tipItem}>
-        0-njy bapy äsgermäň — pinýini we tonlary ilki gowy öwrenseňiz, soň ähli sözler aňsatlaşar.
+        Ýazuw gönükmelerini geçmäň. Olara baha berilmeýär, ýöne öz sözlemiňi düzmek — iň peýdaly maşk.
       </ThemedText>
     </PageWrapper>
   );
@@ -350,9 +335,9 @@ const PAGES: { key: string; render: () => React.ReactNode }[] = [
   { key: "welcome", render: () => <WelcomePage /> },
   { key: "main", render: () => <MainScreenPage /> },
   { key: "chapters", render: () => <ChaptersPage /> },
-  { key: "theory", render: () => <TheoryPage /> },
+  { key: "lesson-flow", render: () => <LessonFlowPage /> },
   { key: "exercises", render: () => <ExercisesPage /> },
-  { key: "test-stroke", render: () => <TestAndStrokePage /> },
+  { key: "test", render: () => <TestPage /> },
   { key: "settings", render: () => <SettingsPage /> },
   { key: "tips", render: () => <TipsPage /> },
 ];

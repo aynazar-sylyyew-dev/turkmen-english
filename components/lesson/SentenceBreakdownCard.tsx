@@ -228,7 +228,7 @@ export default function SentenceBreakdownCard({
         <View style={styles.peekContent}>
           <Ionicons name="help-circle-outline" size={20} color={Colors.subduedTextColor} />
           <ThemedText style={styles.peekText}>
-            Swipe up for detailed help
+            {T.breakdown.swipeForHelp}
           </ThemedText>
         </View>
 
@@ -251,7 +251,7 @@ export default function SentenceBreakdownCard({
           {sentence.transliteration ? (
             <View style={styles.breakdownItem}>
               <View style={styles.labelRow}>
-                <ThemedText style={styles.label}>Transliteration:</ThemedText>
+                <ThemedText style={styles.label}>{T.breakdown.transliterationLabel}</ThemedText>
                 {playButton}
               </View>
               {renderInteractiveSentence("transliteration")}
@@ -259,13 +259,13 @@ export default function SentenceBreakdownCard({
           ) : null}
           <View style={styles.breakdownItem}>
             <View style={styles.labelRow}>
-              <ThemedText style={styles.label}>Target:</ThemedText>
+              <ThemedText style={styles.label}>{T.breakdown.targetLabel}</ThemedText>
               {sentence.transliteration ? null : playButton}
             </View>
             {renderInteractiveSentence("target")}
           </View>
           <View style={styles.breakdownItem}>
-            <ThemedText style={styles.label}>Translation:</ThemedText>
+            <ThemedText style={styles.label}>{T.breakdown.translationLabel}</ThemedText>
             <ThemedText style={styles.translationValue}>
               {sentence.translation}
             </ThemedText>

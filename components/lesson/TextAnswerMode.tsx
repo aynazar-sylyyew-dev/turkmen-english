@@ -2,6 +2,8 @@ import { Colors, FontFamily, Radius } from "@/constants/theme";
 import { haptics } from "@/lib/haptics";
 import { matchesAnswer } from "@/lib/grading";
 import { T } from "@/lib/strings";
+import { speak } from "@/lib/tts";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import {
   Keyboard,
@@ -34,6 +36,7 @@ export default function TextAnswerMode({
   prompt,
   answer,
   acceptableAnswers,
+  audioText,
   hint,
   explanation,
   onAnswer,
@@ -46,6 +49,12 @@ export default function TextAnswerMode({
   prompt?: string;
   answer: string;
   acceptableAnswers?: string[];
+  /**
+   * Dictation mode: this is spoken aloud and never shown. The learner listens
+   * and writes what they heard, so rendering it anywhere would give the answer
+   * away.
+   */
+  audioText?: string;
   hint?: string;
   explanation?: string;
   onAnswer: (correct: boolean) => void;
@@ -91,6 +100,19 @@ export default function TextAnswerMode({
         showsVerticalScrollIndicator={false}
       >
         <ThemedText style={styles.instruction}>{instruction}</ThemedText>
+
+        {audioText ? (
+          <TouchableOpacity
+            style={styles.listenButton}
+            onPress={() => speak(audioText)}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel={T.a11y.playAudio}
+          >
+            <Ionicons name="volume-high" size={28} color={Colors.primaryAccentColor} />
+            <ThemedText style={styles.listenLabel}>{T.freeText.listen}</ThemedText>
+          </TouchableOpacity>
+        ) : null}
 
         {passage ? (
           <View style={styles.passageCard}>
@@ -198,6 +220,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 18,
     marginTop: 12,
+  },
+  listenButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    paddingVertical: 20,
+    borderRadius: Radius.lg,
+    borderWidth: 1.5,
+    borderColor: Colors.primaryAccentColor,
+    backgroundColor: Colors.primaryAccentBg,
+    marginBottom: 16,
+  },
+  listenLabel: {
+    fontFamily: FontFamily.semibold,
+    fontSize: 16,
+    color: Colors.primaryAccentColor,
   },
   passageCard: {
     backgroundColor: Colors.surfaceSecondary,

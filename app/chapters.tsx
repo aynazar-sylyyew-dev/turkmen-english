@@ -1,11 +1,14 @@
-import { THEORY_DATA } from "@/assets/data/theory_content";
 import { ThemedText } from "@/components/themed-text";
 import { CHAPTER_ILLUSTRATIONS } from "@/constants/ChapterIllustrations";
 import { COURSE_DATA } from "@/constants/CourseData";
 import { Colors, FontFamily, Radius, Shadow, Spacing } from "@/constants/theme";
 import { useBookmarks } from "@/lib/bookmarks";
 import { haptics } from "@/lib/haptics";
-import { getAllProgress } from "@/lib/lessonProgress";
+import {
+  getCourseUnlocks,
+  isChapterComplete,
+  type ChapterUnlock,
+} from "@/lib/stepProgress";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { T } from "@/lib/strings";
 import { router, useFocusEffect } from "expo-router";
@@ -13,51 +16,30 @@ import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface Unit {
-  range: [number, number];
-  title: string;
-  subtitle: string;
-}
-
-const UNITS: Unit[] = [
-  { range: [1, 5], title: "Bölüm 1", subtitle: "Tanyşlyk we ýer" },
-  { range: [6, 10], title: "Bölüm 2", subtitle: "Wagt we sanlar" },
-  { range: [11, 15], title: "Bölüm 3", subtitle: "Gündelik durmuş" },
-  { range: [16, 20], title: "Bölüm 4", subtitle: "Adamlar we hyzmat" },
-  { range: [21, 25], title: "Bölüm 5", subtitle: "Saglyk we okuw" },
-  { range: [26, 30], title: "Bölüm 6", subtitle: "Geljek meýiller" },
-];
-
-function getChapterTranslation(fallbackTitle: string): string {
-  const parts = fallbackTitle.split(" — ");
-  return parts[1] ?? "";
-}
-
 export default function ChaptersScreen() {
-  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [courseMap, setCourseMap] = useState<ChapterUnlock[]>([]);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
   const { bookmarks } = useBookmarks();
 
   useFocusEffect(
     useCallback(() => {
-      getAllProgress().then(setProgress);
+      getCourseUnlocks().then(setCourseMap);
     }, []),
   );
 
-  const completedChapterIds = new Set<number>();
-  Object.entries(progress).forEach(([key, count]) => {
-    if (count > 0 && key.startsWith("chapter-")) {
-      const n = Number(key.replace("chapter-", ""));
-      if (!isNaN(n)) completedChapterIds.add(n);
-    }
-  });
+  // Completion comes from the step engine, not from counting storage keys:
+  // a chapter holds several lessons and each records its own progress.
+  const completedChapterIds = new Set(
+    courseMap.filter(isChapterComplete).map((c) => c.chapterId),
+  );
 
-  const nextChapterId = (() => {
-    for (let i = 1; i <= 30; i++) {
-      if (!completedChapterIds.has(i)) return i;
-    }
-    return 30;
-  })();
+  const nextChapterId =
+    COURSE_DATA.chapters.find((ch) => !completedChapterIds.has(ch.id))?.id ??
+    COURSE_DATA.chapters[COURSE_DATA.chapters.length - 1]?.id;
+
+  const visibleChapters = COURSE_DATA.chapters.filter(
+    (ch) => !showBookmarksOnly || bookmarks.has(ch.id),
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -68,7 +50,7 @@ export default function ChaptersScreen() {
         <View style={styles.headerTitleContainer}>
           <ThemedText style={styles.headerTitle}>Sapaklar</ThemedText>
           <ThemedText style={styles.headerSubtitle}>
-            {completedChapterIds.size}/30 geçildi
+            {completedChapterIds.size}/{COURSE_DATA.chapters.length} geçildi
           </ThemedText>
         </View>
         <View style={{ width: 40 }} />
@@ -112,121 +94,84 @@ export default function ChaptersScreen() {
           </View>
         )}
 
-        {/* Units */}
-        {UNITS.map((unit) => {
-          const chaptersInUnit = COURSE_DATA.chapters
-            .filter((ch) => ch.id >= unit.range[0] && ch.id <= unit.range[1])
-            .filter((ch) => !showBookmarksOnly || bookmarks.has(ch.id));
-
-          // A course shorter than the unit ranges leaves trailing sections
-          // empty — render nothing rather than a bare heading.
-          if (chaptersInUnit.length === 0) return null;
-
-          const completedInUnit = chaptersInUnit.filter((ch) =>
-            completedChapterIds.has(ch.id),
-          ).length;
+        {/* Each chapter is its own topic, so the list is flat — the old
+            grouping into five-chapter sections came from the Chinese
+            textbook's structure and has nothing to describe here. */}
+        {visibleChapters.map((chapter) => {
+          const lessonCount = chapter.lessons.length;
+          const isCompleted = completedChapterIds.has(chapter.id);
+          const isCurrent = chapter.id === nextChapterId;
+          const isBookmarked = bookmarks.has(chapter.id);
+          const Illustration = CHAPTER_ILLUSTRATIONS[chapter.id];
 
           return (
-            <View key={unit.title} style={styles.unitSection}>
-              <View style={styles.unitHeader}>
-                <View>
-                  <ThemedText style={styles.unitTitle}>{unit.title}</ThemedText>
-                  <ThemedText style={styles.unitSubtitle}>
-                    {unit.subtitle}
-                  </ThemedText>
-                </View>
-                <View style={styles.unitProgress}>
-                  <ThemedText style={styles.unitProgressText}>
-                    {completedInUnit}/{chaptersInUnit.length}
-                  </ThemedText>
-                </View>
-              </View>
-
-              {chaptersInUnit.map((chapter) => {
-                const totalQuestions = chapter.lessons.reduce(
-                  (sum, lesson) => sum + lesson.questions.length,
-                  0,
-                );
-                const theory = THEORY_DATA[chapter.id];
-                const wordCount = theory?.vocabulary?.length ?? 0;
-                const translation = getChapterTranslation(chapter.title);
-                const isCompleted = completedChapterIds.has(chapter.id);
-                const isCurrent = chapter.id === nextChapterId;
-                const isBookmarked = bookmarks.has(chapter.id);
-                const Illustration = CHAPTER_ILLUSTRATIONS[chapter.id];
-
-                return (
-                  <Pressable
-                    key={chapter.id}
-                    style={({ pressed }) => [
-                      styles.chapterCard,
-                      isCurrent && styles.chapterCardCurrent,
-                      isCompleted && styles.chapterCardCompleted,
-                      pressed && styles.cardPressed,
-                    ]}
-                    onPress={() => {
-                      haptics.tap();
-                      router.push({
-                        pathname: "/chapter-detail",
-                        params: { chapterId: String(chapter.id) },
-                      });
-                    }}
-                  >
-                    <View style={styles.chapterContent}>
-                      <View style={styles.chapterTopRow}>
-                        <View style={styles.chapterNumberBadge}>
-                          <ThemedText style={styles.chapterNumberText}>
-                            {chapter.id}
-                          </ThemedText>
-                        </View>
-                        {isCurrent && (
-                          <View style={styles.currentBadge}>
-                            <ThemedText style={styles.currentBadgeText}>
-                              Indiki
-                            </ThemedText>
-                          </View>
-                        )}
-                        {isCompleted && (
-                          <View style={styles.completedBadge}>
-                            <Ionicons
-                              name="checkmark"
-                              size={12}
-                              color={Colors.textInverse}
-                            />
-                          </View>
-                        )}
-                        {isBookmarked && (
-                          <Ionicons
-                            name="bookmark"
-                            size={14}
-                            color={Colors.primaryAccentColor}
-                            style={{ marginLeft: "auto" }}
-                          />
-                        )}
-                      </View>
-                      <ThemedText
-                        style={styles.chapterTranslation}
-                        numberOfLines={1}
-                      >
-                        {translation}
-                      </ThemedText>
-                      <ThemedText style={styles.chapterMeta}>
-                        {wordCount > 0 && `${wordCount} söz`}
-                        {wordCount > 0 && totalQuestions > 0 && " · "}
-                        {totalQuestions > 0 && `${totalQuestions} gönükme`}
-                        {wordCount === 0 && totalQuestions === 0 && "Diňe teoriýa"}
+            <Pressable
+              key={chapter.id}
+              style={({ pressed }) => [
+                styles.chapterCard,
+                isCurrent && styles.chapterCardCurrent,
+                isCompleted && styles.chapterCardCompleted,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => {
+                haptics.tap();
+                router.push({
+                  pathname: "/chapter-detail",
+                  params: { chapterId: String(chapter.id) },
+                });
+              }}
+            >
+              <View style={styles.chapterContent}>
+                <View style={styles.chapterTopRow}>
+                  <View style={styles.chapterNumberBadge}>
+                    <ThemedText style={styles.chapterNumberText}>
+                      {chapter.id}
+                    </ThemedText>
+                  </View>
+                  {isCurrent && (
+                    <View style={styles.currentBadge}>
+                      <ThemedText style={styles.currentBadgeText}>
+                        Indiki
                       </ThemedText>
                     </View>
+                  )}
+                  {isCompleted && (
+                    <View style={styles.completedBadge}>
+                      <Ionicons
+                        name="checkmark"
+                        size={12}
+                        color={Colors.textInverse}
+                      />
+                    </View>
+                  )}
+                  {isBookmarked && (
+                    <Ionicons
+                      name="bookmark"
+                      size={14}
+                      color={Colors.primaryAccentColor}
+                      style={{ marginLeft: "auto" }}
+                    />
+                  )}
+                </View>
+                <ThemedText style={styles.chapterTitle} numberOfLines={2}>
+                  {chapter.title}
+                </ThemedText>
+                {chapter.description ? (
+                  <ThemedText style={styles.chapterDescription} numberOfLines={2}>
+                    {chapter.description}
+                  </ThemedText>
+                ) : null}
+                <ThemedText style={styles.chapterMeta}>
+                  {T.chapters.lessonCount(lessonCount)}
+                </ThemedText>
+              </View>
 
-                    {Illustration && (
-                      <View style={styles.illustrationBox}>
-                        <Illustration width={52} height={52} />
-                      </View>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
+              {Illustration && (
+                <View style={styles.illustrationBox}>
+                  <Illustration width={52} height={52} />
+                </View>
+              )}
+            </Pressable>
           );
         })}
       </ScrollView>
@@ -299,42 +244,6 @@ const styles = StyleSheet.create({
     color: Colors.textInverse,
   },
 
-  // Unit sections
-  unitSection: {
-    marginBottom: 24,
-  },
-  unitHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  unitTitle: {
-    fontFamily: FontFamily.bold,
-    fontSize: 12,
-    color: Colors.primaryAccentColor,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-  },
-  unitSubtitle: {
-    fontFamily: FontFamily.semibold,
-    fontSize: 16,
-    color: Colors.textPrimary,
-    marginTop: 3,
-  },
-  unitProgress: {
-    backgroundColor: Colors.surfaceSecondary,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: Radius.pill,
-  },
-  unitProgressText: {
-    fontFamily: FontFamily.semibold,
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-
   // Chapter cards
   chapterCard: {
     flexDirection: "row",
@@ -402,10 +311,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  chapterTranslation: {
+  chapterTitle: {
     fontFamily: FontFamily.semibold,
-    fontSize: 15,
-    color: Colors.successColor,
+    fontSize: 16,
+    color: Colors.textPrimary,
+    marginTop: 2,
+  },
+  chapterDescription: {
+    fontFamily: FontFamily.regular,
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 2,
+    marginBottom: 4,
+    lineHeight: 18,
   },
   illustrationBox: {
     width: 72,

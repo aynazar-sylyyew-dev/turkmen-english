@@ -130,6 +130,11 @@ interface FillBlankQuestion extends BaseQuestion {
   correctAnswer: string;
   /** Extra spellings accepted alongside `correctAnswer` when typed. */
   acceptableAnswers?: string[];
+  /**
+   * Dictation: the learner hears this and writes what they heard, so it must
+   * never be rendered as text — showing it turns the exercise into copying.
+   */
+  audioText?: string;
   hint?: string;
   explanation?: string;
   /**

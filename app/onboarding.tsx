@@ -33,7 +33,7 @@ interface SlideData {
 function WelcomeIllustration() {
   return (
     <View style={styles.heroCircle}>
-      <Image source={CHARACTERS.aman.source} style={styles.heroImg} />
+      <Image source={CHARACTERS.ahmet.source} style={styles.heroImg} />
       <View style={styles.waveBadge}>
         <ThemedText style={styles.waveBadgeText}>👋</ThemedText>
       </View>
@@ -92,7 +92,7 @@ function GamificationIllustration() {
 function ReadyIllustration() {
   return (
     <View style={styles.heroCircle}>
-      <Image source={CHARACTERS.aman.source} style={styles.heroImg} />
+      <Image source={CHARACTERS.ahmet.source} style={styles.heroImg} />
       <View style={styles.readyBadge}>
         <Ionicons name="rocket" size={22} color={Colors.textInverse} />
       </View>
@@ -103,9 +103,9 @@ function ReadyIllustration() {
 const SLIDES: SlideData[] = [
   {
     key: "welcome",
-    title: "Salam! Men Aman 👋",
+    title: "Salam! Men Akylly Ahmet 👋",
     subtitle:
-      "Bu programma bilen siz hytaý dilini özbaşdak öwrenip bilersiňiz. Doly oflaýn — internet gerek däl.",
+      "Bu programma bilen siz iňlis dilini özbaşdak öwrenip bilersiňiz. Doly oflaýn — internet gerek däl.",
     illustration: <WelcomeIllustration />,
   },
   {
@@ -125,7 +125,7 @@ const SLIDES: SlideData[] = [
   {
     key: "name",
     title: "Adyňy ýaz",
-    subtitle: "Aman saňa şahsy ýüzlenmek üçin adyňy bilmeli",
+    subtitle: "Ahmet saňa şahsy ýüzlenmek üçin adyňy bilmeli",
     illustration: <ReadyIllustration />,
   },
 ];

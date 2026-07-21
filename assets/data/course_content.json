@@ -125,7 +125,8 @@
             {
               "id": 13,
               "type": "fill_blank",
-              "instruction": "«boxes» — Haýsy sözi eşitdiň?",
+              "instruction": "Haýsy sözi eşitdiň?",
+              "audioText": "boxes",
               "correctAnswer": "boxes",
               "explanation": "box → boxes (-x bilen gutarsa -es goşulýar)."
             },
@@ -245,7 +246,8 @@
             {
               "id": 22,
               "type": "fill_blank",
-              "instruction": "«cats» — Diňle we eşiden sözüňi ýaz.",
+              "instruction": "Diňle we eşiden sözüňi ýaz.",
+              "audioText": "cats",
               "correctAnswer": "cats",
               "explanation": "cat → cats, goşulma [s]."
             },
@@ -336,7 +338,8 @@
             {
               "id": 29,
               "type": "fill_blank",
-              "instruction": "«watches» — Haýsy sözi eşitdiň?",
+              "instruction": "Haýsy sözi eşitdiň?",
+              "audioText": "watches",
               "correctAnswer": "watches",
               "explanation": "watch -ch bilen gutarýar, şonuň üçin watches [iz] bolup eşidilýär."
             }

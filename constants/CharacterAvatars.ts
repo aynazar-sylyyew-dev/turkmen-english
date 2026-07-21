@@ -1,108 +1,86 @@
 import { ImageSourcePropType } from "react-native";
 
-export type CharacterId =
-  | "aman"
-  | "guli"
-  | "zhang-wei"
-  | "li-teacher"
-  | "wang-teacher"
-  | "generic";
+/**
+ * The course cast.
+ *
+ * `ahmet` is the protagonist a learner sees everywhere — the greeting on the
+ * home screen, the empty states, the results screens. The rest only appear in
+ * dialogue pages, which are dormant while the theory pager carries no content.
+ *
+ * The artwork is still the placeholder set carried over from the first course
+ * in the series; commissioning proper art for Akylly Ahmet does not block
+ * anything, because nothing here depends on what the PNGs actually depict.
+ */
+export type CharacterId = "ahmet" | "teacher" | "friend" | "generic";
 
 export interface Character {
   id: CharacterId;
   source: ImageSourcePropType;
-  /** The character's name in the taught language; `displayName` is the
-   *  learner-facing one. Both may be the same for a Latin-script course. */
+  /** The character's name in the taught language. */
   target: string;
   /** Absent for languages that need no pronunciation aid (e.g. English). */
   transliteration?: string;
+  /** The learner-facing name. */
   displayName: string;
 }
 
 export const CHARACTERS: Record<CharacterId, Character> = {
-  aman: {
-    id: "aman",
-    source: require("../assets/characters/aman.png"),
-    target: "阿曼",
-    transliteration: "Āmàn",
-    displayName: "Aman",
+  ahmet: {
+    id: "ahmet",
+    source: require("../assets/characters/ahmet.png"),
+    target: "Ahmet",
+    displayName: "Akylly Ahmet",
   },
-  guli: {
-    id: "guli",
-    source: require("../assets/characters/guli.png"),
-    target: "古丽",
-    transliteration: "Gǔlì",
-    displayName: "Gulnara",
+  teacher: {
+    id: "teacher",
+    source: require("../assets/characters/teacher.png"),
+    target: "Miss Rose",
+    displayName: "Rose mugallym",
   },
-  "zhang-wei": {
-    id: "zhang-wei",
-    source: require("../assets/characters/zhang-wei.png"),
-    target: "张伟",
-    transliteration: "Zhāng Wěi",
-    displayName: "Zhang Wei",
-  },
-  "li-teacher": {
-    id: "li-teacher",
-    source: require("../assets/characters/li-teacher.png"),
-    target: "李老师",
-    transliteration: "Lǐ lǎoshī",
-    displayName: "Li mugallym",
-  },
-  "wang-teacher": {
-    id: "wang-teacher",
-    source: require("../assets/characters/wang-teacher.png"),
-    target: "王老师",
-    transliteration: "Wáng lǎoshī",
-    displayName: "Wang mugallym",
+  friend: {
+    id: "friend",
+    source: require("../assets/characters/friend.png"),
+    target: "Jenny",
+    displayName: "Jenny",
   },
   generic: {
     id: "generic",
     source: require("../assets/characters/generic.png"),
     target: "",
-    transliteration: "",
     displayName: "",
   },
 };
 
 /**
- * Per-chapter speaker mapping (A → first character, B → second character).
- * Based on chapter intros from theory_content.ts.
- * Aman is the protagonist (turkmen student) in most chapters.
+ * Who speaks in each chapter's dialogues (A → first, B → second).
+ *
+ * Chapters the course does not define fall back to the protagonist plus the
+ * neutral figure, so adding a chapter never crashes a dialogue page.
  */
 export const CHAPTER_SPEAKERS: Record<number, [CharacterId, CharacterId]> = {
-  1: ["aman", "li-teacher"],
-  2: ["aman", "zhang-wei"],
-  3: ["aman", "zhang-wei"],
-  4: ["aman", "guli"],
-  5: ["aman", "guli"],
-  6: ["aman", "zhang-wei"],
-  7: ["aman", "zhang-wei"],
-  8: ["aman", "guli"],
-  9: ["aman", "generic"],
-  10: ["aman", "zhang-wei"],
-  11: ["aman", "guli"],
-  12: ["aman", "zhang-wei"],
-  13: ["aman", "zhang-wei"],
-  14: ["aman", "guli"],
-  15: ["aman", "zhang-wei"],
-  16: ["aman", "zhang-wei"],
-  17: ["aman", "wang-teacher"],
-  18: ["aman", "wang-teacher"],
-  19: ["aman", "guli"],
-  20: ["aman", "zhang-wei"],
-  21: ["aman", "zhang-wei"],
-  22: ["aman", "generic"],
-  23: ["aman", "li-teacher"],
-  24: ["aman", "zhang-wei"],
-  25: ["aman", "guli"],
-  26: ["aman", "guli"],
-  27: ["aman", "guli"],
-  28: ["aman", "zhang-wei"],
-  29: ["aman", "guli"],
-  30: ["aman", "zhang-wei"],
+  1: ["ahmet", "teacher"],
+  2: ["ahmet", "friend"],
+  3: ["ahmet", "teacher"],
+  4: ["ahmet", "friend"],
+  5: ["ahmet", "friend"],
+  6: ["ahmet", "teacher"],
+  7: ["ahmet", "friend"],
+  8: ["ahmet", "friend"],
+  9: ["ahmet", "teacher"],
+  10: ["ahmet", "friend"],
+  11: ["ahmet", "friend"],
+  12: ["ahmet", "teacher"],
+  13: ["ahmet", "friend"],
+  14: ["ahmet", "friend"],
+  15: ["ahmet", "teacher"],
+  16: ["ahmet", "friend"],
+  17: ["ahmet", "teacher"],
+  18: ["ahmet", "friend"],
+  19: ["ahmet", "friend"],
+  20: ["ahmet", "teacher"],
 };
 
 export function getChapterSpeakers(chapterId: number): [Character, Character] {
-  const ids = CHAPTER_SPEAKERS[chapterId] ?? ["aman", "generic"];
+  const ids = CHAPTER_SPEAKERS[chapterId] ?? ["ahmet", "generic"];
   return [CHARACTERS[ids[0]], CHARACTERS[ids[1]]];
 }

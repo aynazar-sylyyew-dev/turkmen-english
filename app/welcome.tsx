@@ -21,13 +21,13 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.amanIntro}>
-          <View style={styles.amanCircle}>
-            <Image source={CHARACTERS.aman.source} style={styles.amanImg} />
+        <View style={styles.mascotIntro}>
+          <View style={styles.mascotCircle}>
+            <Image source={CHARACTERS.ahmet.source} style={styles.mascotImg} />
           </View>
-          <View style={styles.amanText}>
-            <ThemedText style={styles.amanGreeting}>Salam! Men Aman 👋</ThemedText>
-            <ThemedText style={styles.amanSub}>
+          <View style={styles.mascotText}>
+            <ThemedText style={styles.mascotGreeting}>Salam! Men Akylly Ahmet 👋</ThemedText>
+            <ThemedText style={styles.mascotSub}>
               Saýla, näme öwrenmek isleýärsiň
             </ThemedText>
           </View>
@@ -53,15 +53,15 @@ export default function WelcomeScreen() {
         <TouchableOpacity
           style={styles.card}
           activeOpacity={0.85}
-          onPress={() => router.push("/about-chinese")}
+          onPress={() => router.push("/about-english")}
         >
           <View style={[styles.iconContainer, { backgroundColor: Colors.successBg }]}>
             <Ionicons name="language-outline" size={26} color={Colors.successColor} />
           </View>
           <View style={styles.cardContent}>
-            <ThemedText style={styles.cardTitle}>Hytaý dili hakynda</ThemedText>
+            <ThemedText style={styles.cardTitle}>Iňlis dili hakynda</ThemedText>
             <ThemedText style={styles.cardSubtitle}>
-              Mandarin, tonlar, pinýin, öwrenmegiň ýollary
+              Elipbiý, söz tertibi, zamanlar, öwrenmegiň ýollary
             </ThemedText>
           </View>
           <Ionicons name="chevron-forward" size={18} color={Colors.subduedTextColor} />
@@ -105,14 +105,14 @@ const styles = StyleSheet.create({
     paddingTop: Spacing["2xl"],
     gap: 12,
   },
-  amanIntro: {
+  mascotIntro: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
     paddingBottom: 8,
     marginBottom: 4,
   },
-  amanCircle: {
+  mascotCircle: {
     width: 64,
     height: 64,
     borderRadius: 32,
@@ -123,15 +123,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden",
   },
-  amanImg: { width: "100%", height: "100%", resizeMode: "cover" },
-  amanText: { flex: 1 },
-  amanGreeting: {
+  mascotImg: { width: "100%", height: "100%", resizeMode: "cover" },
+  mascotText: { flex: 1 },
+  mascotGreeting: {
     fontFamily: FontFamily.bold,
     fontSize: 18,
     color: Colors.textPrimary,
     letterSpacing: -0.3,
   },
-  amanSub: {
+  mascotSub: {
     fontFamily: FontFamily.regular,
     fontSize: 13,
     color: Colors.subduedTextColor,

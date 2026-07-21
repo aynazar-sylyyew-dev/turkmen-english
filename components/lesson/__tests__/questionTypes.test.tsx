@@ -14,6 +14,7 @@ jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock
 jest.mock("@/lib/haptics", () => ({
   haptics: { tap: jest.fn(), success: jest.fn(), error: jest.fn() },
 }));
+jest.mock("@/lib/tts", () => ({ speak: jest.fn(), stopSpeaking: jest.fn() }));
 
 // These cover the behaviour the migration hinges on: typed answers grade
 // through lib/grading, and the non-graded steps can advance the lesson WITHOUT
@@ -137,6 +138,57 @@ describe("TextAnswerMode — typed answers", () => {
     press(footer(tree));
 
     expect(texts(tree)).toContain("I have cats.");
+  });
+});
+
+describe("TextAnswerMode — dictation", () => {
+  const dictation = {
+    instruction: "Haýsy sözi eşitdiň?",
+    answer: "boxes",
+    audioText: "boxes",
+    onAnswer: jest.fn(),
+  };
+
+  beforeEach(() => jest.clearAllMocks());
+
+  it("never renders the word it is asking the learner to hear", () => {
+    const tree = render(<TextAnswerMode {...dictation} />);
+
+    // The whole point of a dictation: seeing the word would make it copying.
+    expect(texts(tree).join(" ")).not.toContain("boxes");
+  });
+
+  it("speaks the word instead, through the app's single TTS entry point", () => {
+    const { speak } = jest.requireMock("@/lib/tts");
+    const tree = render(<TextAnswerMode {...dictation} />);
+
+    // The listen button is the first tappable; the footer is the last.
+    const listen = tree.root.findAllByType(TouchableOpacity)[0];
+    press(listen);
+
+    expect(speak).toHaveBeenCalledWith("boxes");
+  });
+
+  it("grades what was typed against what was spoken", () => {
+    const onAnswer = jest.fn();
+    const tree = render(<TextAnswerMode {...dictation} onAnswer={onAnswer} />);
+
+    act(() => {
+      tree.root.findByType(TextInput).props.onChangeText("Boxes.");
+    });
+    press(footer(tree));
+    press(footer(tree));
+
+    expect(onAnswer).toHaveBeenCalledWith(true);
+  });
+
+  it("shows no listen button when the exercise carries no audio", () => {
+    const tree = render(
+      <TextAnswerMode instruction="Write it" answer="x" onAnswer={jest.fn()} />,
+    );
+
+    // Only the footer button exists.
+    expect(tree.root.findAllByType(TouchableOpacity)).toHaveLength(1);
   });
 });
 

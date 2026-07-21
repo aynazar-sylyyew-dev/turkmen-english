@@ -94,7 +94,7 @@ export default function ChapterTestScreen() {
         <BackHeader title="Synag" />
         <View style={styles.placeholder}>
           <View style={styles.placeholderAvatar}>
-            <Image source={CHARACTERS.aman.source} style={styles.placeholderImg} />
+            <Image source={CHARACTERS.ahmet.source} style={styles.placeholderImg} />
           </View>
           <ThemedText style={styles.placeholderTitle}>Synag taýýarlanýar</ThemedText>
           <ThemedText style={styles.placeholderText}>

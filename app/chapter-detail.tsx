@@ -1,7 +1,6 @@
-import { THEORY_DATA } from "@/assets/data/theory_content";
 import { ThemedText } from "@/components/themed-text";
 import { CHAPTER_ILLUSTRATIONS } from "@/constants/ChapterIllustrations";
-import { COURSE_DATA } from "@/constants/CourseData";
+import { COURSE_DATA, isGradedQuestion } from "@/constants/CourseData";
 import { Colors, FontFamily, Radius, Shadow, Spacing } from "@/constants/theme";
 import { useBookmarks } from "@/lib/bookmarks";
 import { Events, track } from "@/lib/analytics";
@@ -18,19 +17,6 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const UNITS: { range: [number, number]; title: string; subtitle: string }[] = [
-  { range: [1, 5], title: "Bölüm 1", subtitle: "Tanyşlyk we ýer" },
-  { range: [6, 10], title: "Bölüm 2", subtitle: "Wagt we sanlar" },
-  { range: [11, 15], title: "Bölüm 3", subtitle: "Gündelik durmuş" },
-  { range: [16, 20], title: "Bölüm 4", subtitle: "Adamlar we hyzmat" },
-  { range: [21, 25], title: "Bölüm 5", subtitle: "Saglyk we okuw" },
-  { range: [26, 30], title: "Bölüm 6", subtitle: "Geljek meýiller" },
-];
-
-function getUnit(chapterId: number) {
-  return UNITS.find((u) => chapterId >= u.range[0] && chapterId <= u.range[1]);
-}
 
 const STEP_ICONS: Record<StepSubtype, keyof typeof Ionicons.glyphMap> = {
   intro: "flag-outline",
@@ -160,23 +146,11 @@ export default function ChapterDetailScreen() {
     );
   }
 
-  const totalQuestions = chapter.lessons.reduce(
-    (sum, lesson) => sum + lesson.questions.length,
-    0,
-  );
-
-  const theory = THEORY_DATA[id];
-  const keyWord = theory?.vocabulary?.[0];
-  const titleTarget = chapter.title.split(" — ")[0] || keyWord?.target || "";
-  const titleTranslation = chapter.title.split(" — ")[1] || "";
-  const transliteration = keyWord?.transliteration ?? "";
-
-  const wordCount = theory?.vocabulary?.length ?? 0;
-  const grammarCount = theory?.grammar?.length ?? 0;
-  const dialogueCount = theory?.dialogues?.length ?? 0;
+  const allQuestions = chapter.lessons.flatMap((l) => l.questions);
+  const gradedCount = allQuestions.filter(isGradedQuestion).length;
+  const theoryCount = allQuestions.filter((q) => q.type === "theory").length;
 
   const Illustration = CHAPTER_ILLUSTRATIONS[id];
-  const unit = getUnit(id);
 
   const openStep = (step: CourseStep) => {
     haptics.tap();
@@ -235,23 +209,13 @@ export default function ChapterDetailScreen() {
         {/* Hero block */}
         <View style={styles.hero}>
           <View style={styles.heroLeft}>
-            {unit && (
-              <ThemedText style={styles.unitChip}>
-                {unit.title} · {unit.subtitle}
-              </ThemedText>
-            )}
+            {chapter.description ? (
+              <ThemedText style={styles.unitChip}>{chapter.description}</ThemedText>
+            ) : null}
             <ThemedText style={styles.chapterLabel}>
               {chapter.id}-NJI BAP
             </ThemedText>
-            <ThemedText style={styles.targetTitle}>{titleTarget}</ThemedText>
-            {transliteration ? (
-              <ThemedText style={styles.transliterationTitle}>{transliteration}</ThemedText>
-            ) : null}
-            {titleTranslation ? (
-              <ThemedText style={styles.translation}>
-                {titleTranslation}
-              </ThemedText>
-            ) : null}
+            <ThemedText style={styles.targetTitle}>{chapter.title}</ThemedText>
           </View>
           {Illustration && (
             <View style={styles.heroIllustration}>
@@ -263,22 +227,17 @@ export default function ChapterDetailScreen() {
         {/* Stats row */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <ThemedText style={styles.statValue}>{wordCount}</ThemedText>
-            <ThemedText style={styles.statLabel}>söz</ThemedText>
+            <ThemedText style={styles.statValue}>{chapter.lessons.length}</ThemedText>
+            <ThemedText style={styles.statLabel}>sapak</ThemedText>
           </View>
           <View style={styles.statSep} />
           <View style={styles.statBox}>
-            <ThemedText style={styles.statValue}>{grammarCount}</ThemedText>
-            <ThemedText style={styles.statLabel}>grammatika</ThemedText>
+            <ThemedText style={styles.statValue}>{theoryCount}</ThemedText>
+            <ThemedText style={styles.statLabel}>düşündiriş</ThemedText>
           </View>
           <View style={styles.statSep} />
           <View style={styles.statBox}>
-            <ThemedText style={styles.statValue}>{dialogueCount}</ThemedText>
-            <ThemedText style={styles.statLabel}>dialog</ThemedText>
-          </View>
-          <View style={styles.statSep} />
-          <View style={styles.statBox}>
-            <ThemedText style={styles.statValue}>{totalQuestions}</ThemedText>
+            <ThemedText style={styles.statValue}>{gradedCount}</ThemedText>
             <ThemedText style={styles.statLabel}>gönükme</ThemedText>
           </View>
         </View>

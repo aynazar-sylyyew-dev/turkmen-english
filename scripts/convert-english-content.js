@@ -156,12 +156,16 @@ function convertStep(step, lessonId) {
         explanation: keep(step.explanation),
       };
 
+    // Dictation: the word travels in `audioText`, which the app speaks and
+    // never renders. Putting it in the prompt instead would turn "which word
+    // did you hear?" into copying.
     case "listening":
-      report.converted.push(`${lessonId}/${step.id}: listening → fill_blank`);
+      report.converted.push(`${lessonId}/${step.id}: listening → fill_blank (dictation)`);
       return {
         ...base,
         type: "fill_blank",
-        instruction: step.prompt ? `«${step.text}» — ${step.prompt}` : step.text,
+        instruction: step.prompt || "Diňle we eşiden sözüňi ýaz.",
+        audioText: step.text,
         correctAnswer: step.answer,
         acceptableAnswers: keep(step.acceptableAnswers),
         hint: keep(step.hint),
@@ -344,6 +348,21 @@ function validate(course) {
   if (new Set(ids).size !== ids.length) problems.push("question ids are not unique");
   if (course.chapters.length !== 20) problems.push(`expected 20 chapters, got ${course.chapters.length}`);
   if (lessonCount !== 80) problems.push(`expected 80 lessons, got ${lessonCount}`);
+
+  // A dictation must never leak the word it is asking for.
+  for (const ch of course.chapters) {
+    for (const lesson of ch.lessons) {
+      for (const q of lesson.questions) {
+        if (q.type !== "fill_blank" || !q.audioText) continue;
+        const shown = [q.instruction, q.sentence, q.hint].filter(Boolean).join(" ");
+        if (shown.toLowerCase().includes(q.audioText.toLowerCase())) {
+          problems.push(
+            `${lesson.id} q${q.id}: dictation word "${q.audioText}" is visible in the prompt`,
+          );
+        }
+      }
+    }
+  }
 
   // Every typed answer must actually have something to check against.
   for (const ch of course.chapters) {

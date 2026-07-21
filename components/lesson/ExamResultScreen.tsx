@@ -76,8 +76,8 @@ export default function ExamResultScreen({
             { transform: [{ scale: scaleAnim }], opacity: fadeAnim },
           ]}
         >
-          <View style={[styles.amanCircle, { backgroundColor: accentBg, borderColor: accent }]}>
-            <Image source={CHARACTERS.aman.source} style={styles.amanImg} />
+          <View style={[styles.mascotCircle, { backgroundColor: accentBg, borderColor: accent }]}>
+            <Image source={CHARACTERS.ahmet.source} style={styles.mascotImg} />
             <View style={[styles.statusBadge, { backgroundColor: accent }]}>
               <Ionicons
                 name={passed ? "checkmark" : "refresh"}
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
   content: { padding: 20, paddingTop: 56, paddingBottom: 200 },
   badgeContainer: { alignItems: "center", marginBottom: 28 },
-  amanCircle: {
+  mascotCircle: {
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     overflow: "visible",
     marginBottom: 18,
   },
-  amanImg: {
+  mascotImg: {
     width: "100%",
     height: "100%",
     borderRadius: 60,
