@@ -1,0 +1,260 @@
+import { ThemedText } from "@/components/themed-text";
+import { Colors, FontFamily, Radius, Spacing } from "@/constants/theme";
+import { exportProgress, importProgress } from "@/lib/backup";
+import { haptics } from "@/lib/haptics";
+import { syncStreakReminder } from "@/lib/notifications";
+import { resetOnboarding } from "@/lib/onboarding";
+import { useSettings } from "@/lib/settings";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { T } from "@/lib/strings";
+import { router } from "expo-router";
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+export default function SettingsScreen() {
+  const { settings, updateSetting, loaded } = useSettings();
+
+  return (
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} hitSlop={20} style={styles.backButton} accessibilityRole="button" accessibilityLabel={T.a11y.back}>
+          <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
+        </Pressable>
+        <View style={styles.headerTitleContainer}>
+          <ThemedText style={styles.headerTitle}>Sazlamalar</ThemedText>
+        </View>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {!loaded ? (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={Colors.primaryAccentColor} />
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ThemedText style={styles.sectionTitle}>Ýatlatmalar</ThemedText>
+          <View style={styles.toggleRow}>
+            <View style={{ flex: 1, marginRight: 12 }}>
+              <ThemedText style={styles.settingLabel}>Gündelik ýatlatma</ThemedText>
+              <ThemedText style={styles.settingDescription}>
+                Her gün streagyňy dowam etmegi ýatladýar
+              </ThemedText>
+            </View>
+            <Switch
+              value={settings.remindersEnabled}
+              onValueChange={(v) => {
+                haptics.tap();
+                updateSetting("remindersEnabled", v);
+                void syncStreakReminder(v);
+              }}
+              trackColor={{
+                true: Colors.primaryAccentColor,
+                false: Colors.borderColorStrong,
+              }}
+              thumbColor={Colors.surfacePrimary}
+            />
+          </View>
+
+          <ThemedText style={[styles.sectionTitle, { marginTop: 12 }]}>
+            Maglumatlar
+          </ThemedText>
+          <Pressable
+            style={({ pressed }) => [
+              styles.actionRow,
+              pressed && styles.actionRowPressed,
+            ]}
+            onPress={async () => {
+              haptics.tap();
+              const r = await exportProgress(new Date().toISOString());
+              if (!r.ok && r.reason !== "cancelled") {
+                Alert.alert(T.backup.failed);
+              }
+            }}
+          >
+            <View style={styles.actionIcon}>
+              <Ionicons
+                name="download-outline"
+                size={22}
+                color={Colors.primaryAccentColor}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <ThemedText style={styles.actionTitle}>{T.backup.exportTitle}</ThemedText>
+              <ThemedText style={styles.actionSubtitle}>
+                {T.backup.exportSubtitle}
+              </ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.subduedTextColor} />
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.actionRow,
+              pressed && styles.actionRowPressed,
+            ]}
+            onPress={async () => {
+              haptics.tap();
+              const r = await importProgress();
+              if (r.ok) Alert.alert(T.backup.importDone);
+              else if (r.reason !== "cancelled") Alert.alert(T.backup.failed);
+            }}
+          >
+            <View style={styles.actionIcon}>
+              <Ionicons
+                name="cloud-upload-outline"
+                size={22}
+                color={Colors.primaryAccentColor}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <ThemedText style={styles.actionTitle}>{T.backup.importTitle}</ThemedText>
+              <ThemedText style={styles.actionSubtitle}>
+                {T.backup.importSubtitle}
+              </ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.subduedTextColor} />
+          </Pressable>
+
+          <ThemedText style={[styles.sectionTitle, { marginTop: 12 }]}>
+            Beýleki
+          </ThemedText>
+          <Pressable
+            style={({ pressed }) => [
+              styles.actionRow,
+              pressed && styles.actionRowPressed,
+            ]}
+            onPress={async () => {
+              haptics.tap();
+              await resetOnboarding();
+              router.replace("/onboarding");
+            }}
+          >
+            <View style={styles.actionIcon}>
+              <Ionicons
+                name="play-circle-outline"
+                size={22}
+                color={Colors.primaryAccentColor}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <ThemedText style={styles.actionTitle}>
+                Tanyşlygy täzeden görkez
+              </ThemedText>
+              <ThemedText style={styles.actionSubtitle}>
+                4 sahypalyk programma syny
+              </ThemedText>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={Colors.subduedTextColor}
+            />
+          </Pressable>
+        </ScrollView>
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.surfacePrimary,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.divider,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontFamily: FontFamily.bold,
+    fontSize: 18,
+    color: Colors.textPrimary,
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scrollContent: {
+    padding: Spacing.lg,
+    paddingBottom: 40,
+  },
+  sectionTitle: {
+    fontFamily: FontFamily.semibold,
+    fontSize: 12,
+    color: Colors.subduedTextColor,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  toggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.surfacePrimary,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    padding: 16,
+    marginBottom: 14,
+  },
+  settingLabel: {
+    fontFamily: FontFamily.semibold,
+    fontSize: 16,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  settingDescription: {
+    fontFamily: FontFamily.regular,
+    fontSize: 13,
+    color: Colors.subduedTextColor,
+    marginBottom: 14,
+    lineHeight: 18,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.surfacePrimary,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    gap: 12,
+  },
+  actionRowPressed: {
+    backgroundColor: Colors.surfaceSecondary,
+  },
+  actionIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primaryAccentBg,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionTitle: {
+    fontFamily: FontFamily.semibold,
+    fontSize: 14,
+    color: Colors.textPrimary,
+  },
+  actionSubtitle: {
+    fontFamily: FontFamily.regular,
+    fontSize: 12,
+    color: Colors.subduedTextColor,
+    marginTop: 2,
+  },
+});
