@@ -63,7 +63,7 @@ export default function MultipleChoiceMode({
                   isSelected && { color: Colors.primaryAccentColor },
                 ]}
               >
-                {option.english}
+                {option.translation}
               </ThemedText>
             </Pressable>
           );

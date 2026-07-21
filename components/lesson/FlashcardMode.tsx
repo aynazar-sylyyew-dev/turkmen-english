@@ -3,7 +3,7 @@ import { Colors, FontFamily } from "@/constants/theme";
 import { haptics } from "@/lib/haptics";
 import { T } from "@/lib/strings";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as Speech from "expo-speech";
+import { speak } from "@/lib/tts";
 import { useEffect, useState } from "react";
 import {
   Pressable,
@@ -21,15 +21,16 @@ import Animated, {
 import { ThemedText } from "../themed-text";
 
 export default function FlashcardMode({
-  hanzi,
-  pinyin,
+  target,
+  transliteration,
   instruction,
   options,
   correctOptionId,
   onAnswer,
 }: {
-  hanzi: string;
-  pinyin: string;
+  target: string;
+  /** Absent for languages that need no pronunciation aid (e.g. English). */
+  transliteration?: string;
   instruction: string;
   options: FlashcardOption[];
   correctOptionId: number;
@@ -71,7 +72,7 @@ export default function FlashcardMode({
   };
 
   const playAudio = () => {
-    Speech.speak(hanzi, { language: "zh-CN" });
+    speak(target);
   };
 
   const getOptionStyle = (id: number) => {
@@ -105,8 +106,8 @@ export default function FlashcardMode({
         <TouchableOpacity onPress={playAudio} style={styles.speakerButton} accessibilityRole="button" accessibilityLabel={T.a11y.playAudio}>
           <Ionicons name="volume-high" size={22} color={Colors.primaryAccentColor} />
         </TouchableOpacity>
-        <ThemedText style={styles.hanziText}>{hanzi}</ThemedText>
-        <ThemedText style={styles.pinyinText}>{pinyin}</ThemedText>
+        <ThemedText style={styles.targetText}>{target}</ThemedText>
+        <ThemedText style={styles.transliterationText}>{transliteration}</ThemedText>
       </Animated.View>
 
       <ThemedText style={styles.instruction}>{instruction}</ThemedText>
@@ -123,9 +124,9 @@ export default function FlashcardMode({
             onPress={() => handleSelect(option.id)}
             disabled={answered}
           >
-            <ThemedText style={styles.optionEnglish}>{option.english}</ThemedText>
+            <ThemedText style={styles.optionTranslation}>{option.translation}</ThemedText>
             {answered && (
-              <ThemedText style={styles.optionChinese}>{option.pinyin}</ThemedText>
+              <ThemedText style={styles.optionTransliteration}>{option.transliteration}</ThemedText>
             )}
           </Pressable>
         ))}
@@ -171,14 +172,14 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   speakerButton: { marginBottom: 8 },
-  hanziText: {
+  targetText: {
     fontFamily: FontFamily.bold,
     fontSize: 52,
     lineHeight: 60,
     color: Colors.primaryAccentColor,
     marginBottom: 4,
   },
-  pinyinText: {
+  transliterationText: {
     fontFamily: FontFamily.medium,
     fontSize: 18,
     color: Colors.textSecondary,
@@ -205,13 +206,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 76,
   },
-  optionEnglish: {
+  optionTranslation: {
     fontFamily: FontFamily.semibold,
     fontSize: 15,
     color: Colors.textPrimary,
     textAlign: "center",
   },
-  optionChinese: {
+  optionTransliteration: {
     fontFamily: FontFamily.regular,
     fontSize: 12,
     color: Colors.subduedTextColor,

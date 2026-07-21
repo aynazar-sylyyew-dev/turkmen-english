@@ -14,7 +14,7 @@ import { haptics } from "@/lib/haptics";
 import { markTheoryStepDone } from "@/lib/stepProgress";
 import { T } from "@/lib/strings";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as Speech from "expo-speech";
+import { speak, stopSpeaking } from "@/lib/tts";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -31,8 +31,10 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-function speak(text: string) {
-  Speech.speak(text, { language: "zh-CN", rate: 0.8 });
+// Theory pages read slower than the exercise screens — learners are reading
+// along with the text here, not being tested.
+function speakSlowly(text: string) {
+  speak(text, { rate: 0.8 });
 }
 
 // --- Page content components ---
@@ -51,16 +53,16 @@ function VocabularyPage({ vocabulary }: { vocabulary: TheoryWord[] }) {
   return (
     <ScrollView style={styles.pageScroll} contentContainerStyle={styles.pageContent}>
       <ThemedText style={styles.pageLabel}>Täze sözler</ThemedText>
-      <ThemedText style={styles.pageTitle}>词语表</ThemedText>
+      <ThemedText style={styles.pageTitle}>{T.screen.vocabularyTitle}</ThemedText>
       <View style={styles.wordTable}>
         {vocabulary.map((word, i) => (
           <View key={i} style={styles.wordRow}>
-            <Pressable style={styles.wordTextArea} onPress={() => speak(word.hanzi)}>
-              <ThemedText style={styles.wordHanzi}>{word.hanzi}</ThemedText>
-              <ThemedText style={styles.wordPinyin}>{word.pinyin}</ThemedText>
+            <Pressable style={styles.wordTextArea} onPress={() => speakSlowly(word.target)}>
+              <ThemedText style={styles.wordTarget}>{word.target}</ThemedText>
+              <ThemedText style={styles.wordTransliteration}>{word.transliteration}</ThemedText>
               <ThemedText style={styles.wordTranslation}>{word.translation}</ThemedText>
             </Pressable>
-            <Pressable onPress={() => speak(word.hanzi)} hitSlop={8} accessibilityRole="button" accessibilityLabel={T.a11y.playAudio}>
+            <Pressable onPress={() => speakSlowly(word.target)} hitSlop={8} accessibilityRole="button" accessibilityLabel={T.a11y.playAudio}>
               <Ionicons name="volume-medium-outline" size={18} color={Colors.subduedTextColor} />
             </Pressable>
           </View>
@@ -79,10 +81,10 @@ function GrammarPage({ rule }: { rule: { title: string; explanation: string; exa
       {rule.examples.length > 0 && (
         <View style={styles.examplesContainer}>
           {rule.examples.map((ex, j) => (
-            <Pressable key={j} style={styles.exampleRow} onPress={() => speak(ex.hanzi)}>
+            <Pressable key={j} style={styles.exampleRow} onPress={() => speakSlowly(ex.target)}>
               <View style={styles.exampleTextCol}>
-                <ThemedText style={styles.exampleHanzi}>{ex.hanzi}</ThemedText>
-                <ThemedText style={styles.examplePinyin}>{ex.pinyin}</ThemedText>
+                <ThemedText style={styles.exampleTarget}>{ex.target}</ThemedText>
+                <ThemedText style={styles.exampleTransliteration}>{ex.transliteration}</ThemedText>
                 <ThemedText style={styles.exampleTranslation}>{ex.translation}</ThemedText>
               </View>
               <Ionicons name="volume-medium-outline" size={16} color={Colors.subduedTextColor} />
@@ -109,14 +111,13 @@ function DialoguePage({
   useEffect(() => {
     return () => {
       cancelRef.current = true;
-      Speech.stop();
+      stopSpeaking();
     };
   }, []);
 
   const playLine = (index: number, onDone?: () => void) => {
     setCurrentIndex(index);
-    Speech.speak(dialogue.lines[index].hanzi, {
-      language: "zh-CN",
+    speak(dialogue.lines[index].target, {
       rate: 0.8,
       onDone: () => onDone?.(),
       onStopped: () => onDone?.(),
@@ -126,7 +127,7 @@ function DialoguePage({
 
   const stopAll = () => {
     cancelRef.current = true;
-    Speech.stop();
+    stopSpeaking();
     setIsPlaying(false);
     setCurrentIndex(null);
   };
@@ -162,7 +163,7 @@ function DialoguePage({
   const playSingle = (index: number) => {
     if (isPlaying) return;
     haptics.tap();
-    Speech.stop();
+    stopSpeaking();
     playLine(index, () => setCurrentIndex(null));
   };
 
@@ -231,7 +232,7 @@ function DialoguePage({
                 onPress={() => playSingle(j)}
               >
                 <View style={styles.bubbleHeader}>
-                  <ThemedText style={styles.bubbleHanzi}>{line.hanzi}</ThemedText>
+                  <ThemedText style={styles.bubbleTarget}>{line.target}</ThemedText>
                   <Ionicons
                     name={isActive ? "volume-high" : "volume-medium-outline"}
                     size={14}
@@ -240,11 +241,11 @@ function DialoguePage({
                 </View>
                 <ThemedText
                   style={[
-                    styles.bubblePinyin,
-                    isA ? styles.bubblePinyinA : styles.bubblePinyinB,
+                    styles.bubbleTransliteration,
+                    isA ? styles.bubbleTransliterationA : styles.bubbleTransliterationB,
                   ]}
                 >
-                  {line.pinyin}
+                  {line.transliteration}
                 </ThemedText>
                 <ThemedText
                   style={[
@@ -273,15 +274,15 @@ function DialoguePage({
           <Ionicons name="volume-high" size={12} color={Colors.textInverse} />
           <ThemedText style={styles.captionLabelText}>
             {currentLine.speaker === "A"
-              ? speakerA.hanzi || "A"
-              : speakerB.hanzi || "B"}
+              ? speakerA.target || "A"
+              : speakerB.target || "B"}
           </ThemedText>
         </View>
-        <ThemedText style={styles.captionPinyin} numberOfLines={2}>
-          {currentLine.pinyin}
+        <ThemedText style={styles.captionTransliteration} numberOfLines={2}>
+          {currentLine.transliteration}
         </ThemedText>
-        <ThemedText style={styles.captionHanzi} numberOfLines={1}>
-          {currentLine.hanzi}
+        <ThemedText style={styles.captionTarget} numberOfLines={1}>
+          {currentLine.target}
         </ThemedText>
       </View>
     )}
@@ -296,7 +297,7 @@ function CharacterChip({
   character: Character;
   side: "A" | "B";
 }) {
-  if (!character.hanzi && !character.displayName) return null;
+  if (!character.target && !character.displayName) return null;
   return (
     <View
       style={[
@@ -313,11 +314,11 @@ function CharacterChip({
         <Image source={character.source} style={styles.charChipAvatarImage} />
       </View>
       <View style={{ flex: 1 }}>
-        {character.hanzi ? (
-          <ThemedText style={styles.charChipHanzi}>{character.hanzi}</ThemedText>
+        {character.target ? (
+          <ThemedText style={styles.charChipTarget}>{character.target}</ThemedText>
         ) : null}
-        {character.pinyin ? (
-          <ThemedText style={styles.charChipPinyin}>{character.pinyin}</ThemedText>
+        {character.transliteration ? (
+          <ThemedText style={styles.charChipTransliteration}>{character.transliteration}</ThemedText>
         ) : null}
       </View>
     </View>
@@ -661,13 +662,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   wordTextArea: { flex: 1, flexDirection: "row", alignItems: "center", gap: 8 },
-  wordHanzi: {
+  wordTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 22,
     color: Colors.primaryAccentColor,
     width: 60,
   },
-  wordPinyin: {
+  wordTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 13,
     color: Colors.textPrimary,
@@ -696,12 +697,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   exampleTextCol: { flex: 1 },
-  exampleHanzi: {
+  exampleTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 19,
     color: Colors.primaryAccentColor,
   },
-  examplePinyin: {
+  exampleTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 13,
     color: Colors.textPrimary,
@@ -773,12 +774,12 @@ const styles = StyleSheet.create({
   },
   charChipAvatarA: { backgroundColor: Colors.successColor + "30" },
   charChipAvatarB: { backgroundColor: Colors.primaryAccentColor + "20" },
-  charChipHanzi: {
+  charChipTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 14,
     color: Colors.textPrimary,
   },
-  charChipPinyin: {
+  charChipTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 11,
     color: Colors.subduedTextColor,
@@ -842,14 +843,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.textInverse,
   },
-  captionPinyin: {
+  captionTransliteration: {
     fontFamily: FontFamily.bold,
     fontSize: 22,
     lineHeight: 28,
     color: Colors.textInverse,
     letterSpacing: -0.3,
   },
-  captionHanzi: {
+  captionTarget: {
     fontFamily: FontFamily.medium,
     fontSize: 14,
     color: "rgba(255,255,255,0.7)",
@@ -877,20 +878,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  bubbleHanzi: {
+  bubbleTarget: {
     flex: 1,
     fontFamily: FontFamily.bold,
     fontSize: 19,
     lineHeight: 26,
     color: Colors.textPrimary,
   },
-  bubblePinyin: {
+  bubbleTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 13,
     marginTop: 4,
   },
-  bubblePinyinA: { color: Colors.successColorDark },
-  bubblePinyinB: { color: Colors.primaryAccentColorDark },
+  bubbleTransliterationA: { color: Colors.successColorDark },
+  bubbleTransliterationB: { color: Colors.primaryAccentColorDark },
   bubbleTranslation: {
     fontFamily: FontFamily.regular,
     fontSize: 12,

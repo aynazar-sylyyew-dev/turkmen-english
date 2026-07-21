@@ -12,7 +12,7 @@ import {
   recordQuestionListened,
 } from "@/lib/speakingListeningStats";
 import { router } from "expo-router";
-import * as Speech from "expo-speech";
+import { speak, stopSpeaking } from "@/lib/tts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import ConfirmDialog from "../ui/ConfirmDialog";
@@ -58,7 +58,7 @@ export default function LessonContent({
 }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [exitConfirmVisible, setExitConfirmVisible] = useState(false);
-  const [showMandarin, setShowMandarin] = useState(false);
+  const [showPhrase, setShowPhrase] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [hasListenedToAudio, setHasListenedToAudio] = useState(false);
@@ -111,7 +111,7 @@ export default function LessonContent({
     if (rewardableRef.current) void addXP(XP_REWARDS.CORRECT_ANSWER);
   };
 
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Opacity pinyin/hanzi
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Opacity of the revealed phrase
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const optionsAnimValue = useRef(new Animated.Value(0)).current;
   const audioSectionAnimHeight = useRef(new Animated.Value(400)).current;
@@ -136,15 +136,15 @@ export default function LessonContent({
 
     if (currentQuestion.type === "listening_mc") {
       if (showResult) {
-        const correctEnglish =
+        const correctTranslation =
           currentQuestion.options.find(
-            (opt: { id: number; english: string }) => opt.id === currentQuestion.correctOptionId,
-          )?.english || "";
+            (opt: { id: number; translation: string }) => opt.id === currentQuestion.correctOptionId,
+          )?.translation || "";
         return {
           id: currentQuestion.id,
-          english: correctEnglish,
-          mandarin: {
-            ...currentQuestion.mandarin,
+          translation: correctTranslation,
+          phrase: {
+            ...currentQuestion.phrase,
           },
         };
       }
@@ -157,12 +157,12 @@ export default function LessonContent({
 
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeaking();
     };
   }, []);
 
   useEffect(() => {
-    Speech.stop();
+    stopSpeaking();
     setIsSpeechPlaying(false);
   }, [currentQuestion]);
 
@@ -268,17 +268,16 @@ export default function LessonContent({
       return;
     }
     const textToSpeak =
-      currentQuestion.mandarin.hanzi || currentQuestion.mandarin.pinyin;
+      currentQuestion.phrase.target || currentQuestion.phrase.transliteration || "";
 
     if (isSpeechPlaying) {
-      Speech.stop();
+      stopSpeaking();
       setIsSpeechPlaying(false);
       return;
     }
 
     setIsSpeechPlaying(true);
-    Speech.speak(textToSpeak, {
-      language: "zh-CN",
+    speak(textToSpeak, {
       onDone: () => {
         setIsSpeechPlaying(false);
         finishListening();
@@ -292,15 +291,15 @@ export default function LessonContent({
     });
   };
 
-  const handleRevealMandarin = () => {
-    if (showMandarin) {
+  const handleRevealPhrase = () => {
+    if (showPhrase) {
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 250,
         useNativeDriver: true,
-      }).start(() => setShowMandarin(false));
+      }).start(() => setShowPhrase(false));
     } else {
-      setShowMandarin(true);
+      setShowPhrase(true);
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 250,
@@ -449,12 +448,12 @@ export default function LessonContent({
   };
 
   const resetState = () => {
-    setShowMandarin(false);
+    setShowPhrase(false);
     setSelectedOption(null);
     setShowResult(false);
     setHasListenedToAudio(false);
     setAttemptCount(0);
-    Speech.stop();
+    stopSpeaking();
     setIsSpeechPlaying(false);
     fadeAnim.setValue(0);
     scaleAnim.setValue(1);
@@ -506,7 +505,7 @@ export default function LessonContent({
         destructive
         onConfirm={async () => {
           setExitConfirmVisible(false);
-          Speech.stop();
+          stopSpeaking();
           if (onExit) {
             onExit();
           } else if (router.canGoBack()) {
@@ -528,8 +527,8 @@ export default function LessonContent({
       {currentQuestion.type === "flashcard" && (
         <FlashcardMode
           key={currentQuestion.id}
-          hanzi={currentQuestion.mandarin.hanzi}
-          pinyin={currentQuestion.mandarin.pinyin}
+          target={currentQuestion.phrase.target}
+          transliteration={currentQuestion.phrase.transliteration}
           instruction={currentQuestion.instruction}
           options={currentQuestion.options}
           correctOptionId={currentQuestion.correctOptionId}
@@ -541,7 +540,7 @@ export default function LessonContent({
         <FillBlankMode
           key={currentQuestion.id}
           sentence={currentQuestion.sentence}
-          sentencePinyin={currentQuestion.sentencePinyin}
+          sentenceTransliteration={currentQuestion.sentenceTransliteration}
           blankedWord={currentQuestion.blankedWord}
           correctAnswer={currentQuestion.correctAnswer}
           hint={currentQuestion.hint}
@@ -591,9 +590,9 @@ export default function LessonContent({
               isPlaying={isSpeechPlaying}
               hasListenedToAudio={hasListenedToAudio}
               onPlay={playAudio}
-              onRevealMandarin={handleRevealMandarin}
+              onRevealPhrase={handleRevealPhrase}
               currentQuestion={currentQuestion}
-              showMandarin={showMandarin}
+              showPhrase={showPhrase}
               scaleAnim={scaleAnim}
               instructionOpacity={instructionOpacity}
               listeningOpacity={listeningOpacity}
@@ -682,14 +681,14 @@ export default function LessonContent({
         hasListenedToAudio && (
           <SentenceBreakdownCard
             sentence={{
-              english:
+              translation:
                 currentQuestion.options.find(
                   (opt) => opt.id === currentQuestion.correctOptionId,
-                )?.english || "",
-              pinyin: currentQuestion.mandarin.pinyin,
-              hanzi: currentQuestion.mandarin.hanzi,
-              words: currentQuestion.mandarin.words,
-              breakdown: currentQuestion.mandarin.breakdown,
+                )?.translation || "",
+              transliteration: currentQuestion.phrase.transliteration,
+              target: currentQuestion.phrase.target,
+              words: currentQuestion.phrase.words,
+              breakdown: currentQuestion.phrase.breakdown,
             }}
             disabled={showResult}
           />
@@ -699,11 +698,11 @@ export default function LessonContent({
         selectedSentence && (
           <SentenceBreakdownCard
             sentence={{
-              english: selectedSentence.english,
-              pinyin: selectedSentence.mandarin.pinyin,
-              hanzi: selectedSentence.mandarin.hanzi,
-              words: selectedSentence.mandarin.words,
-              breakdown: selectedSentence.mandarin.breakdown,
+              translation: selectedSentence.translation,
+              transliteration: selectedSentence.phrase.transliteration,
+              target: selectedSentence.phrase.target,
+              words: selectedSentence.phrase.words,
+              breakdown: selectedSentence.phrase.breakdown,
             }}
             disabled={showResult}
           />

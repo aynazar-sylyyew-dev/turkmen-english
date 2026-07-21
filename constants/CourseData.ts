@@ -19,9 +19,9 @@ export interface ConversationScenario {
 }
 
 interface PhrasebookEntry {
-  hanzi: string;
-  pinyin: string;
-  english: string;
+  target: string;
+  transliteration?: string;
+  translation: string;
 }
 
 export interface Chapter {
@@ -43,40 +43,41 @@ interface BaseQuestion {
   id: number;
 }
 
-interface MandarinPrompt {
-  hanzi: string;
-  pinyin: string;
+// `target` is the text in the language being taught; `transliteration` is its
+// optional pronunciation aid (pinyin for Chinese, absent for English);
+// `translation` is the learner's own language.
+interface Phrase {
+  target: string;
+  transliteration?: string;
 }
 
 export interface Word {
-  hanzi: string;
-  pinyin: string;
-  english: string;
+  target: string;
+  transliteration?: string;
+  translation: string;
 }
 
-interface MandarinPhrase {
-  hanzi: string;
-  pinyin: string;
+interface PhraseDetail extends Phrase {
   words: Word[];
   breakdown: string;
 }
 
 export interface SpeakingOption {
   id: number;
-  english: string;
-  mandarin: MandarinPhrase;
+  translation: string;
+  phrase: PhraseDetail;
 }
 
 export interface ListeningOption {
   id: number;
-  english: string;
+  translation: string;
 }
 
 // --- Existing question types ---
 
 interface MultipleChoiceQuestion extends BaseQuestion {
   type: "multiple_choice";
-  mandarin: MandarinPrompt;
+  phrase: Phrase;
   options: SpeakingOption[];
   correctOptionId: number;
   instruction?: string;
@@ -84,16 +85,13 @@ interface MultipleChoiceQuestion extends BaseQuestion {
 
 interface SingleResponseQuestion extends BaseQuestion {
   type: "single_response";
-  mandarin: MandarinPrompt;
+  phrase: Phrase;
   options: [SpeakingOption];
 }
 
 interface ListeningMultipleChoiceQuestion extends BaseQuestion {
   type: "listening_mc";
-  mandarin: MandarinPrompt & {
-    words: Word[];
-    breakdown: string;
-  };
+  phrase: PhraseDetail;
   options: ListeningOption[];
   correctOptionId: number;
 }
@@ -102,14 +100,14 @@ interface ListeningMultipleChoiceQuestion extends BaseQuestion {
 
 export interface FlashcardOption {
   id: number;
-  english: string;
-  hanzi: string;
-  pinyin: string;
+  translation: string;
+  target: string;
+  transliteration?: string;
 }
 
 interface FlashcardQuestion extends BaseQuestion {
   type: "flashcard";
-  mandarin: MandarinPrompt;
+  phrase: Phrase;
   instruction: string;
   options: FlashcardOption[];
   correctOptionId: number;
@@ -117,14 +115,14 @@ interface FlashcardQuestion extends BaseQuestion {
 
 interface FillBlankOption {
   id: number;
-  hanzi: string;
-  pinyin?: string;
+  target: string;
+  transliteration?: string;
 }
 
 interface FillBlankQuestion extends BaseQuestion {
   type: "fill_blank";
   sentence: string;
-  sentencePinyin: string;
+  sentenceTransliteration?: string;
   blankedWord: string;
   correctAnswer: string;
   hint?: string;
@@ -135,7 +133,7 @@ interface FillBlankQuestion extends BaseQuestion {
 export interface MatchPair {
   id: number;
   left: string;
-  leftPinyin?: string;
+  leftTransliteration?: string;
   right: string;
 }
 
@@ -146,9 +144,9 @@ interface MatchPairsQuestion extends BaseQuestion {
 }
 
 export interface GrammarExample {
-  hanzi: string;
-  pinyin: string;
-  english: string;
+  target: string;
+  transliteration?: string;
+  translation: string;
 }
 
 export interface GrammarPracticeOption {

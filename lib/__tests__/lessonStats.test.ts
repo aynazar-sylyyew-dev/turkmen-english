@@ -4,9 +4,9 @@ import { computeLessonStats } from "@/lib/lessonStats";
 const flashcard = (id: number): Question => ({
   id,
   type: "flashcard",
-  mandarin: { hanzi: "好", pinyin: "hǎo" },
+  phrase: { target: "好", transliteration: "hǎo" },
   instruction: "Saýla",
-  options: [{ id: 1, english: "good", hanzi: "好", pinyin: "hǎo" }],
+  options: [{ id: 1, translation: "good", target: "好", transliteration: "hǎo" }],
   correctOptionId: 1,
 });
 
@@ -49,8 +49,8 @@ describe("computeLessonStats", () => {
     expect(stats.firstTryCorrect).toBe(2); // 3 total − 1 wrong
     expect(stats.wrongQuestions).toEqual([
       {
-        english: "good",
-        mandarin: { hanzi: "好", pinyin: "hǎo" },
+        translation: "good",
+        phrase: { target: "好", transliteration: "hǎo" },
         attempts: 3,
       },
     ]);

@@ -183,15 +183,15 @@ export default function LessonCompleteScreen({
                     />
                   </View>
                   <View style={styles.questionContent}>
-                    <ThemedText style={styles.questionEnglish}>
-                      {question.english}
+                    <ThemedText style={styles.questionTranslation}>
+                      {question.translation}
                     </ThemedText>
-                    <View style={styles.questionMandarin}>
-                      <ThemedText style={styles.questionPinyin}>
-                        {question.mandarin.pinyin}
+                    <View style={styles.questionPhrase}>
+                      <ThemedText style={styles.questionTransliteration}>
+                        {question.phrase.transliteration}
                       </ThemedText>
-                      <ThemedText style={styles.questionHanzi}>
-                        {question.mandarin.hanzi}
+                      <ThemedText style={styles.questionTarget}>
+                        {question.phrase.target}
                       </ThemedText>
                     </View>
                   </View>
@@ -457,19 +457,19 @@ const styles = StyleSheet.create({
   },
   wrongIndicator: { marginRight: 10, marginTop: 1 },
   questionContent: { flex: 1, marginRight: 8 },
-  questionEnglish: {
+  questionTranslation: {
     fontFamily: FontFamily.semibold,
     fontSize: 15,
     color: Colors.textPrimary,
     marginBottom: 6,
   },
-  questionMandarin: { gap: 2 },
-  questionPinyin: {
+  questionPhrase: { gap: 2 },
+  questionTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 14,
     color: Colors.textSecondary,
   },
-  questionHanzi: {
+  questionTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 16,
     color: Colors.primaryAccentColor,

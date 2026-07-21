@@ -11,8 +11,11 @@ export type CharacterId =
 export interface Character {
   id: CharacterId;
   source: ImageSourcePropType;
-  hanzi: string;
-  pinyin: string;
+  /** The character's name in the taught language; `displayName` is the
+   *  learner-facing one. Both may be the same for a Latin-script course. */
+  target: string;
+  /** Absent for languages that need no pronunciation aid (e.g. English). */
+  transliteration?: string;
   displayName: string;
 }
 
@@ -20,43 +23,43 @@ export const CHARACTERS: Record<CharacterId, Character> = {
   aman: {
     id: "aman",
     source: require("../assets/characters/aman.png"),
-    hanzi: "阿曼",
-    pinyin: "Āmàn",
+    target: "阿曼",
+    transliteration: "Āmàn",
     displayName: "Aman",
   },
   guli: {
     id: "guli",
     source: require("../assets/characters/guli.png"),
-    hanzi: "古丽",
-    pinyin: "Gǔlì",
+    target: "古丽",
+    transliteration: "Gǔlì",
     displayName: "Gulnara",
   },
   "zhang-wei": {
     id: "zhang-wei",
     source: require("../assets/characters/zhang-wei.png"),
-    hanzi: "张伟",
-    pinyin: "Zhāng Wěi",
+    target: "张伟",
+    transliteration: "Zhāng Wěi",
     displayName: "Zhang Wei",
   },
   "li-teacher": {
     id: "li-teacher",
     source: require("../assets/characters/li-teacher.png"),
-    hanzi: "李老师",
-    pinyin: "Lǐ lǎoshī",
+    target: "李老师",
+    transliteration: "Lǐ lǎoshī",
     displayName: "Li mugallym",
   },
   "wang-teacher": {
     id: "wang-teacher",
     source: require("../assets/characters/wang-teacher.png"),
-    hanzi: "王老师",
-    pinyin: "Wáng lǎoshī",
+    target: "王老师",
+    transliteration: "Wáng lǎoshī",
     displayName: "Wang mugallym",
   },
   generic: {
     id: "generic",
     source: require("../assets/characters/generic.png"),
-    hanzi: "",
-    pinyin: "",
+    target: "",
+    transliteration: "",
     displayName: "",
   },
 };

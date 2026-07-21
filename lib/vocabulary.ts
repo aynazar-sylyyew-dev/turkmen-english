@@ -5,9 +5,9 @@ export const getChapterVocabulary = (chapterId: number): Word[] => {
   const chapter = THEORY_DATA[chapterId];
   if (!chapter) return [];
   return chapter.vocabulary.map((w) => ({
-    hanzi: w.hanzi,
-    pinyin: w.pinyin,
-    english: w.translation,
+    target: w.target,
+    transliteration: w.transliteration,
+    translation: w.translation,
   }));
 };
 
@@ -17,19 +17,19 @@ export const getUniqueWordsFromQuestions = (questions: Question[]): Word[] => {
     let wordSource: Word[] = [];
 
     if (question.type === "listening_mc") {
-      wordSource = question.mandarin.words || [];
+      wordSource = question.phrase.words || [];
     } else if (
       question.type === "multiple_choice" ||
       question.type === "single_response"
     ) {
       wordSource = question.options.flatMap(
-        (opt: { mandarin: { words: Word[] } }) => opt.mandarin.words || [],
+        (opt: { phrase: { words: Word[] } }) => opt.phrase.words || [],
       );
     }
 
     wordSource.forEach((word: Word) => {
-      if (word && word.hanzi && !allWords.has(word.hanzi)) {
-        allWords.set(word.hanzi, word);
+      if (word && word.target && !allWords.has(word.target)) {
+        allWords.set(word.target, word);
       }
     });
   });

@@ -47,8 +47,8 @@ export default function SingleResponseMode({
         </Animated.View>
       </View>
       <View style={styles.singleResponseContainer}>
-        <ThemedText style={styles.singleResponseEnglish}>
-          {option.english}
+        <ThemedText style={styles.singleResponseTranslation}>
+          {option.translation}
         </ThemedText>
         <TouchableOpacity
           style={styles.revealButton}
@@ -60,12 +60,12 @@ export default function SingleResponseMode({
               {T.shadowing.reveal}
             </ThemedText>
           ) : (
-            <View style={styles.singleResponseMandarin}>
-              <ThemedText style={styles.optionDetailsHanzi}>
-                {option.mandarin.hanzi}
+            <View style={styles.singleResponsePhrase}>
+              <ThemedText style={styles.optionDetailsTarget}>
+                {option.phrase.target}
               </ThemedText>
-              <ThemedText style={styles.optionDetailsPinyin}>
-                {option.mandarin.pinyin}
+              <ThemedText style={styles.optionDetailsTransliteration}>
+                {option.phrase.transliteration}
               </ThemedText>
             </View>
           )}
@@ -108,13 +108,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.subduedTextColor,
   },
-  optionDetailsHanzi: {
+  optionDetailsTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 28,
     color: Colors.primaryAccentColor,
     marginBottom: 6,
   },
-  optionDetailsPinyin: {
+  optionDetailsTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 15,
     color: Colors.textSecondary,
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryAccentBg,
     alignItems: "center",
   },
-  singleResponseEnglish: {
+  singleResponseTranslation: {
     fontFamily: FontFamily.semibold,
     fontSize: 17,
     color: Colors.textPrimary,
     textAlign: "center",
   },
-  singleResponseMandarin: { alignItems: "center", marginTop: 12 },
+  singleResponsePhrase: { alignItems: "center", marginTop: 12 },
   continueButton: {
     flexDirection: "row",
     alignItems: "center",

@@ -2,10 +2,10 @@ import type { Question } from "@/constants/CourseData";
 import { T } from "@/lib/strings";
 
 export interface WrongQuestion {
-  english: string;
-  mandarin: {
-    hanzi: string;
-    pinyin: string;
+  translation: string;
+  phrase: {
+    target: string;
+    transliteration: string;
   };
   attempts: number;
 }
@@ -44,44 +44,44 @@ export function computeLessonStats(
   const wrongQuestionsList = questions
     .filter((q) => wrongQuestions.has(q.id))
     .map((q) => {
-      let english = "";
-      let hanzi = "";
-      let pinyin = "";
+      let translation = "";
+      let target = "";
+      let transliteration = "";
 
       if (q.type === "listening_mc") {
-        english =
-          q.options.find((opt) => opt.id === q.correctOptionId)?.english || "";
-        hanzi = q.mandarin.hanzi;
-        pinyin = q.mandarin.pinyin;
+        translation =
+          q.options.find((opt) => opt.id === q.correctOptionId)?.translation || "";
+        target = q.phrase.target;
+        transliteration = q.phrase.transliteration ?? "";
       } else if (q.type === "multiple_choice" || q.type === "single_response") {
         const option = q.options[0];
-        english = option.english;
-        hanzi = option.mandarin.hanzi;
-        pinyin = option.mandarin.pinyin;
+        translation = option.translation;
+        target = option.phrase.target;
+        transliteration = option.phrase.transliteration ?? "";
       } else if (q.type === "flashcard") {
         const correct = q.options.find((opt) => opt.id === q.correctOptionId);
-        english = correct?.english || "";
-        hanzi = q.mandarin.hanzi;
-        pinyin = q.mandarin.pinyin;
+        translation = correct?.translation || "";
+        target = q.phrase.target;
+        transliteration = q.phrase.transliteration ?? "";
       } else if (q.type === "fill_blank") {
-        english = q.correctAnswer;
-        hanzi = q.sentence;
-        pinyin = q.sentencePinyin;
+        translation = q.correctAnswer;
+        target = q.sentence;
+        transliteration = q.sentenceTransliteration ?? "";
       } else if (q.type === "match_pairs") {
-        english = T.screen.matchPairsLabel;
-        hanzi = q.pairs.map((p) => p.left).join(", ");
-        pinyin = "";
+        translation = T.screen.matchPairsLabel;
+        target = q.pairs.map((p) => p.left).join(", ");
+        transliteration = "";
       } else if (q.type === "grammar") {
-        english = q.rule.title;
-        hanzi = "";
-        pinyin = "";
+        translation = q.rule.title;
+        target = "";
+        transliteration = "";
       }
 
       return {
-        english,
-        mandarin: {
-          hanzi,
-          pinyin,
+        translation,
+        phrase: {
+          target,
+          transliteration,
         },
         attempts: questionAttempts[q.id] || 1,
       };

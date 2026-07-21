@@ -2,7 +2,7 @@ import { Word } from "@/constants/CourseData";
 import { Colors, FontFamily } from "@/constants/theme";
 import { T } from "@/lib/strings";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as Speech from "expo-speech";
+import { speak, stopSpeaking } from "@/lib/tts";
 import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -40,9 +40,10 @@ export default function SentenceBreakdownCard({
   disabled,
 }: {
   sentence: {
-    english: string;
-    pinyin: string;
-    hanzi: string;
+    translation: string;
+    /** Absent for languages that need no pronunciation aid (e.g. English). */
+    transliteration?: string;
+    target: string;
     words: Word[];
     breakdown: string;
   };
@@ -54,17 +55,17 @@ export default function SentenceBreakdownCard({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const cardRef = useRef<Animated.View>(null);
   const tooltipWidthRef = useRef<number>(0);
-  const hanziWordRefs = useRef<Array<View | null>>([]);
-  const pinyinWordRefs = useRef<Array<View | null>>([]);
+  const targetWordRefs = useRef<Array<View | null>>([]);
+  const transliterationWordRefs = useRef<Array<View | null>>([]);
   const [selectedWord, setSelectedWord] = useState<{
-    type: "hanzi" | "pinyin";
+    type: "target" | "transliteration";
     index: number;
   } | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopSpeaking();
     };
   }, []);
 
@@ -115,35 +116,34 @@ export default function SentenceBreakdownCard({
 
   const playAudio = () => {
     if (isPlaying) {
-      Speech.stop();
+      stopSpeaking();
       setIsPlaying(false);
       return;
     }
 
-    const text = sentence.hanzi || sentence.pinyin;
+    const text = sentence.target || sentence.transliteration;
     if (!text) return;
 
     setIsPlaying(true);
-    Speech.speak(text, {
-      language: "zh-CN",
+    speak(text, {
       onDone: () => setIsPlaying(false),
       onStopped: () => setIsPlaying(false),
       onError: () => setIsPlaying(false),
     });
   };
 
-  const showTooltip = (word: Word, type: "hanzi" | "pinyin", index: number) => {
+  const showTooltip = (word: Word, type: "target" | "transliteration", index: number) => {
     const wordRef =
-      type === "hanzi"
-        ? hanziWordRefs.current[index]
-        : pinyinWordRefs.current[index];
+      type === "target"
+        ? targetWordRefs.current[index]
+        : transliterationWordRefs.current[index];
     if (!wordRef) return;
 
     wordRef.measureInWindow((wordX, wordY, wordWidth) => {
       cardRef.current?.measureInWindow((cardX, cardY) => {
         setTooltip({
           visible: true,
-          text: word.english,
+          text: word.translation,
           x: wordX + wordWidth / 2,
           y: wordY - cardY,
           width: wordWidth,
@@ -153,21 +153,21 @@ export default function SentenceBreakdownCard({
     });
   };
 
-  const renderInteractiveSentence = (type: "hanzi" | "pinyin") => (
+  const renderInteractiveSentence = (type: "target" | "transliteration") => (
     <Pressable onPress={hideTooltip}>
       <View style={styles.interactiveSentenceContainer}>
         {sentence.words.map((word, index) => (
           <Pressable
             key={index}
             ref={(ref) => {
-              if (type === "hanzi") hanziWordRefs.current[index] = ref;
-              else pinyinWordRefs.current[index] = ref;
+              if (type === "target") targetWordRefs.current[index] = ref;
+              else transliterationWordRefs.current[index] = ref;
             }}
             onPress={() => showTooltip(word, type, index)}
           >
             <ThemedText
               style={[
-                type === "hanzi" ? styles.hanziValue : styles.pinyinValue,
+                type === "target" ? styles.targetValue : styles.transliterationValue,
                 selectedWord &&
                   selectedWord.type === type &&
                   selectedWord.index === index &&
@@ -231,7 +231,7 @@ export default function SentenceBreakdownCard({
 
           <View style={styles.breakdownItem}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <ThemedText style={styles.label}>Pinyin:</ThemedText>
+              <ThemedText style={styles.label}>Transliteration:</ThemedText>
               <Pressable
                 onPress={playAudio}
                 disabled={disabled}
@@ -245,16 +245,16 @@ export default function SentenceBreakdownCard({
                 />
               </Pressable>
             </View>
-            {renderInteractiveSentence("pinyin")}
+            {renderInteractiveSentence("transliteration")}
           </View>
           <View style={styles.breakdownItem}>
-            <ThemedText style={styles.label}>Hanzi:</ThemedText>
-            {renderInteractiveSentence("hanzi")}
+            <ThemedText style={styles.label}>Target:</ThemedText>
+            {renderInteractiveSentence("target")}
           </View>
           <View style={styles.breakdownItem}>
-            <ThemedText style={styles.label}>English:</ThemedText>
-            <ThemedText style={styles.englishValue}>
-              {sentence.english}
+            <ThemedText style={styles.label}>Translation:</ThemedText>
+            <ThemedText style={styles.translationValue}>
+              {sentence.translation}
             </ThemedText>
           </View>
           <View style={styles.breakdownItem}>
@@ -359,19 +359,19 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
   },
-  pinyinValue: {
+  transliterationValue: {
     fontFamily: FontFamily.medium,
     fontSize: 17,
     color: Colors.textPrimary,
     lineHeight: 28,
   },
-  hanziValue: {
+  targetValue: {
     fontFamily: FontFamily.bold,
     fontSize: 22,
     color: Colors.primaryAccentColor,
     lineHeight: 34,
   },
-  englishValue: {
+  translationValue: {
     fontFamily: FontFamily.regular,
     fontSize: 16,
     color: Colors.textPrimary,

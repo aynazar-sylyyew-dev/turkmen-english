@@ -11,7 +11,7 @@ import ProgressHeader from "./ProgressHeader";
 interface StudyCard {
   key: string;
   word: Word;
-  direction: "zh-en" | "en-zh";
+  direction: "target-first" | "translation-first";
 }
 
 interface DeckBuckets {
@@ -33,15 +33,15 @@ interface StudyState {
 
 const buildDeck = (words: Word[]): DeckBuckets => {
   const recognition: StudyCard[] = words.map((word) => ({
-    key: `${word.hanzi}-recognition`,
+    key: `${word.target}-recognition`,
     word,
-    direction: "zh-en",
+    direction: "target-first",
   }));
 
   const recall: StudyCard[] = words.map((word) => ({
-    key: `${word.hanzi}-recall`,
+    key: `${word.target}-recall`,
     word,
-    direction: "en-zh",
+    direction: "translation-first",
   }));
 
   return {

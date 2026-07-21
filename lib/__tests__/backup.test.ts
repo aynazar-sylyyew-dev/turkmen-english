@@ -3,7 +3,27 @@ jest.mock("expo-file-system/legacy", () => ({}));
 jest.mock("expo-sharing", () => ({}));
 jest.mock("expo-document-picker", () => ({}));
 
-import { buildBackup, parseBackup, restoreEntries } from "@/lib/backup";
+import { BACKUP_KEYS, buildBackup, parseBackup, restoreEntries } from "@/lib/backup";
+
+describe("BACKUP_KEYS", () => {
+  // A key missing here is not a crash — restoreEntries silently drops it and
+  // the user loses that slice of progress. step_progress and exam_results were
+  // both absent once, which lost every chapter unlock and exam pass on restore.
+  it("covers every module that persists progress", () => {
+    expect([...BACKUP_KEYS].sort()).toEqual([
+      "app_settings",
+      "bookmarked_chapters",
+      "exam_results",
+      "has_onboarded",
+      "lesson_progress",
+      "speaking_listening_stats",
+      "step_progress",
+      "streak_data",
+      "total_xp",
+      "user_name",
+    ]);
+  });
+});
 
 describe("buildBackup", () => {
   it("packs non-null entries into a versioned backup", () => {
@@ -16,7 +36,7 @@ describe("buildBackup", () => {
       "2026-06-07T09:00:00.000Z",
     );
     expect(backup).toEqual({
-      app: "turkmen-chinese",
+      app: "turkmen-english",
       version: 1,
       exportedAt: "2026-06-07T09:00:00.000Z",
       data: { total_xp: "510", streak_data: '{"currentStreak":3}' },
@@ -27,7 +47,7 @@ describe("buildBackup", () => {
 describe("parseBackup", () => {
   it("accepts a valid backup", () => {
     const json = JSON.stringify({
-      app: "turkmen-chinese",
+      app: "turkmen-english",
       version: 1,
       exportedAt: "x",
       data: { total_xp: "10" },
@@ -38,14 +58,14 @@ describe("parseBackup", () => {
   it("rejects foreign or malformed files", () => {
     expect(parseBackup("not json")).toBeNull();
     expect(parseBackup(JSON.stringify({ app: "other", data: {} }))).toBeNull();
-    expect(parseBackup(JSON.stringify({ app: "turkmen-chinese" }))).toBeNull();
+    expect(parseBackup(JSON.stringify({ app: "turkmen-english" }))).toBeNull();
   });
 });
 
 describe("restoreEntries", () => {
   it("returns only known string-valued keys", () => {
     const backup = {
-      app: "turkmen-chinese",
+      app: "turkmen-english",
       version: 1,
       exportedAt: "x",
       data: {

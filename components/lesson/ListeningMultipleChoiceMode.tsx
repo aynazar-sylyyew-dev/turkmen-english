@@ -59,7 +59,7 @@ export default function ListeningMultipleChoiceMode({
                   isSelected && { color: Colors.primaryAccentColor },
                 ]}
               >
-                {option.english}
+                {option.translation}
               </ThemedText>
             </Pressable>
           );

@@ -28,22 +28,22 @@ function getGreeting(name: string | null): string {
   return `Salam ${display}`;
 }
 
-function getNextChapter(completedIds: Set<number>): { id: number; title: string; hanzi: string } {
+function getNextChapter(completedIds: Set<number>): { id: number; title: string; target: string } {
   for (const ch of COURSE_DATA.chapters) {
     if (!completedIds.has(ch.id)) {
       const theory = THEORY_DATA[ch.id];
-      const firstHanzi = theory?.vocabulary?.[0]?.hanzi ?? ch.title.split(" ")[0];
+      const firstTarget = theory?.vocabulary?.[0]?.target ?? ch.title.split(" ")[0];
       const titleParts = ch.title.split(" — ");
       const cleanTitle = titleParts[1] ?? titleParts[0];
-      return { id: ch.id, title: cleanTitle, hanzi: firstHanzi };
+      return { id: ch.id, title: cleanTitle, target: firstTarget };
     }
   }
-  // All done — return chapter 30 as celebration
-  const last = COURSE_DATA.chapters.find((c) => c.id === 30);
+  // All done — show the last chapter as a celebration.
+  const last = COURSE_DATA.chapters[COURSE_DATA.chapters.length - 1];
   return {
-    id: 30,
+    id: last?.id ?? 1,
     title: last?.title.split(" — ")[1] ?? "",
-    hanzi: "完",
+    target: "★",
   };
 }
 
@@ -146,9 +146,9 @@ export default function LessonsContent() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      {/* Watermark */}
+      {/* Watermark — a glyph from the taught language's script. */}
       <View pointerEvents="none" style={styles.watermarkContainer}>
-        <ThemedText style={styles.watermark}>学</ThemedText>
+        <ThemedText style={styles.watermark}>Aa</ThemedText>
       </View>
 
       <ScrollView
@@ -230,7 +230,7 @@ export default function LessonsContent() {
           }}
         >
           <View style={styles.heroBg}>
-            <ThemedText style={styles.heroHanzi}>{next.hanzi}</ThemedText>
+            <ThemedText style={styles.heroTarget}>{next.target}</ThemedText>
           </View>
           <View style={styles.heroContent}>
             <ThemedText style={styles.heroLabel}>
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  heroHanzi: {
+  heroTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 76,
     lineHeight: 84,

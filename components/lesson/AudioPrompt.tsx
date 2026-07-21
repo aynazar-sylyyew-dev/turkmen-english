@@ -19,9 +19,9 @@ export default function AudioPrompt({
   isPlaying,
   hasListenedToAudio,
   onPlay,
-  onRevealMandarin,
+  onRevealPhrase,
   currentQuestion,
-  showMandarin,
+  showPhrase,
   scaleAnim,
   instructionOpacity,
   listeningOpacity,
@@ -31,9 +31,11 @@ export default function AudioPrompt({
   isPlaying: boolean;
   hasListenedToAudio: boolean;
   onPlay: () => void;
-  onRevealMandarin: () => void;
-  currentQuestion: Extract<Question, { mandarin: { hanzi: string; pinyin: string } }>;
-  showMandarin: boolean;
+  onRevealPhrase: () => void;
+  // Every question type that carries an audible phrase. Matching on `target`
+  // alone keeps this working for languages with no transliteration.
+  currentQuestion: Extract<Question, { phrase: { target: string } }>;
+  showPhrase: boolean;
   scaleAnim: Animated.Value;
   instructionOpacity: Animated.Value;
   listeningOpacity: Animated.Value;
@@ -122,14 +124,14 @@ export default function AudioPrompt({
               </ThemedText>
             </Animated.View>
           </View>
-        ) : showMandarin ? (
-          <TouchableOpacity onPress={onRevealMandarin}>
-            <Animated.View style={[styles.mandarinText, { opacity: fadeAnim }]}>
-              <ThemedText style={styles.pinyin}>
-                {currentQuestion.mandarin.pinyin}
+        ) : showPhrase ? (
+          <TouchableOpacity onPress={onRevealPhrase}>
+            <Animated.View style={[styles.phraseText, { opacity: fadeAnim }]}>
+              <ThemedText style={styles.transliteration}>
+                {currentQuestion.phrase.transliteration}
               </ThemedText>
-              <ThemedText style={styles.hanzi}>
-                {currentQuestion.mandarin.hanzi}
+              <ThemedText style={styles.target}>
+                {currentQuestion.phrase.target}
               </ThemedText>
             </Animated.View>
           </TouchableOpacity>
@@ -137,7 +139,7 @@ export default function AudioPrompt({
           currentQuestion.type !== "listening_mc" && (
             <TouchableOpacity
               style={styles.revealButton}
-              onPress={onRevealMandarin}
+              onPress={onRevealPhrase}
               hitSlop={{ top: 10, bottom: 10, left: 20, right: 20 }}
             >
               <ThemedText style={styles.instructionText}>
@@ -172,18 +174,18 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  mandarinText: {
+  phraseText: {
     alignItems: "center",
     padding: 16,
     borderRadius: 12,
   },
-  pinyin: {
+  transliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 16,
     color: Colors.textSecondary,
     marginBottom: 6,
   },
-  hanzi: {
+  target: {
     fontFamily: FontFamily.bold,
     fontSize: 22,
     color: Colors.primaryAccentColor,

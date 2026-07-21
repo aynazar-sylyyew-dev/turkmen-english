@@ -167,9 +167,9 @@ export default function ChapterDetailScreen() {
 
   const theory = THEORY_DATA[id];
   const keyWord = theory?.vocabulary?.[0];
-  const titleHanzi = chapter.title.split(" — ")[0] || keyWord?.hanzi || "";
+  const titleTarget = chapter.title.split(" — ")[0] || keyWord?.target || "";
   const titleTranslation = chapter.title.split(" — ")[1] || "";
-  const pinyin = keyWord?.pinyin ?? "";
+  const transliteration = keyWord?.transliteration ?? "";
 
   const wordCount = theory?.vocabulary?.length ?? 0;
   const grammarCount = theory?.grammar?.length ?? 0;
@@ -238,9 +238,9 @@ export default function ChapterDetailScreen() {
             <ThemedText style={styles.chapterLabel}>
               {chapter.id}-NJI BAP
             </ThemedText>
-            <ThemedText style={styles.hanziTitle}>{titleHanzi}</ThemedText>
-            {pinyin ? (
-              <ThemedText style={styles.pinyinTitle}>{pinyin}</ThemedText>
+            <ThemedText style={styles.targetTitle}>{titleTarget}</ThemedText>
+            {transliteration ? (
+              <ThemedText style={styles.transliterationTitle}>{transliteration}</ThemedText>
             ) : null}
             {titleTranslation ? (
               <ThemedText style={styles.translation}>
@@ -360,14 +360,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     marginBottom: 6,
   },
-  hanziTitle: {
+  targetTitle: {
     fontFamily: FontFamily.bold,
     fontSize: 44,
     lineHeight: 50,
     color: Colors.primaryAccentColor,
     letterSpacing: -1,
   },
-  pinyinTitle: {
+  transliterationTitle: {
     fontFamily: FontFamily.medium,
     fontSize: 18,
     color: Colors.textSecondary,

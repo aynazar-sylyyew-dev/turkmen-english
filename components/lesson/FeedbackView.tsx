@@ -98,15 +98,15 @@ export function FeedbackView({
             </ThemedText>
           </View>
           <View style={styles.correctAnswerContent}>
-            <ThemedText style={styles.correctAnswerEnglish}>
-              {correctOption.english}
+            <ThemedText style={styles.correctAnswerTranslation}>
+              {correctOption.translation}
             </ThemedText>
-            <View style={styles.correctAnswerMandarin}>
-              <ThemedText style={styles.correctAnswerHanzi}>
-                {correctOption.mandarin.hanzi}
+            <View style={styles.correctAnswerPhrase}>
+              <ThemedText style={styles.correctAnswerTarget}>
+                {correctOption.phrase.target}
               </ThemedText>
-              <ThemedText style={styles.correctAnswerPinyin}>
-                {correctOption.mandarin.pinyin}
+              <ThemedText style={styles.correctAnswerTransliteration}>
+                {correctOption.phrase.transliteration}
               </ThemedText>
             </View>
           </View>
@@ -222,19 +222,19 @@ const styles = StyleSheet.create({
     color: Colors.successColor,
   },
   correctAnswerContent: { gap: 6 },
-  correctAnswerEnglish: {
+  correctAnswerTranslation: {
     fontFamily: FontFamily.semibold,
     fontSize: 14,
     color: Colors.textPrimary,
     marginBottom: 4,
   },
-  correctAnswerMandarin: { gap: 2 },
-  correctAnswerHanzi: {
+  correctAnswerPhrase: { gap: 2 },
+  correctAnswerTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 20,
     color: Colors.primaryAccentColor,
   },
-  correctAnswerPinyin: {
+  correctAnswerTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 13,
     color: Colors.textSecondary,

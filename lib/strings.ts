@@ -103,6 +103,7 @@ export const T = {
     theoryPlaceholder: "Teoriýa ýakyn wagtda goşular.",
     chapterNotFound: "Bap tapylmady",
     matchPairsLabel: "Jübütleri birikdir",
+    vocabularyTitle: "Sözlük",
   },
 
   // Диалог подтверждения (дефолтные подписи, обычно переопределяются)
@@ -124,7 +125,7 @@ export const T = {
 
   // Упражнение на произношение — режим «повтори вслух» (shadowing)
   shadowing: {
-    prompt: "Diňläp, bu jümläni hytaýça gaýtalaň",
+    prompt: "Diňläp, bu jümläni gaýtalaň",
     reveal: "Aýdylyşyny görmek üçin basyň",
   },
 

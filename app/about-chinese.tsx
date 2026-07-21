@@ -37,38 +37,38 @@ function PageWrapper({
 
 function ToneRow({
   tone,
-  pinyin,
-  hanzi,
+  transliteration,
+  target,
   meaning,
 }: {
   tone: string;
-  pinyin: string;
-  hanzi: string;
+  transliteration: string;
+  target: string;
   meaning: string;
 }) {
   return (
     <View style={styles.toneRow}>
       <ThemedText style={styles.toneLabel}>{tone}</ThemedText>
-      <ThemedText style={styles.toneHanzi}>{hanzi}</ThemedText>
-      <ThemedText style={styles.tonePinyin}>{pinyin}</ThemedText>
+      <ThemedText style={styles.toneTarget}>{target}</ThemedText>
+      <ThemedText style={styles.toneTransliteration}>{transliteration}</ThemedText>
       <ThemedText style={styles.toneMeaning}>{meaning}</ThemedText>
     </View>
   );
 }
 
 function PhraseRow({
-  hanzi,
-  pinyin,
+  target,
+  transliteration,
   meaning,
 }: {
-  hanzi: string;
-  pinyin: string;
+  target: string;
+  transliteration: string;
   meaning: string;
 }) {
   return (
     <View style={styles.phraseRow}>
-      <ThemedText style={styles.phraseHanzi}>{hanzi}</ThemedText>
-      <ThemedText style={styles.phrasePinyin}>{pinyin}</ThemedText>
+      <ThemedText style={styles.phraseTarget}>{target}</ThemedText>
+      <ThemedText style={styles.phraseTransliteration}>{transliteration}</ThemedText>
       <ThemedText style={styles.phraseMeaning}>{meaning}</ThemedText>
     </View>
   );
@@ -144,10 +144,10 @@ function TonesPage() {
         Тоны — самая важная часть произношения. Один слог &quot;ma&quot; может означать 4 разных слова:
       </ThemedText>
       <View style={styles.toneTable}>
-        <ToneRow tone="1-й — ровный" pinyin="m&#257;" hanzi="&#22920;" meaning="мама" />
-        <ToneRow tone="2-й — восходящий" pinyin="m&#225;" hanzi="&#40635;" meaning="конопля" />
-        <ToneRow tone="3-й — нисх.-восх." pinyin="m&#462;" hanzi="&#39532;" meaning="лошадь" />
-        <ToneRow tone="4-й — нисходящий" pinyin="m&#224;" hanzi="&#39554;" meaning="ругать" />
+        <ToneRow tone="1-й — ровный" transliteration="m&#257;" target="&#22920;" meaning="мама" />
+        <ToneRow tone="2-й — восходящий" transliteration="m&#225;" target="&#40635;" meaning="конопля" />
+        <ToneRow tone="3-й — нисх.-восх." transliteration="m&#462;" target="&#39532;" meaning="лошадь" />
+        <ToneRow tone="4-й — нисходящий" transliteration="m&#224;" target="&#39554;" meaning="ругать" />
       </View>
       <ThemedText style={styles.body}>
         Первый тон (&#257;) — голос ровный и высокий, как будто вы поёте одну ноту. Второй тон (&#225;) — голос поднимается вверх, как когда вы удивлённо спрашиваете &quot;Да?&quot;. Третий тон (&#462;) — голос сначала опускается, потом поднимается, как когда вы задумчиво говорите &quot;Хм...&quot;. Четвёртый тон (&#224;) — голос резко падает, как строгая команда &quot;Нет!&quot;.
@@ -162,15 +162,15 @@ function TonesPage() {
   );
 }
 
-function PinyinPage() {
+function TransliterationPage() {
   return (
     <PageWrapper label="拼音" title="Что такое пиньинь?">
       <ThemedText style={styles.body}>
         Пиньинь (拼音) — официальная система записи произношения китайских слов латинскими буквами (A-Z). Она была создана в 1958 году для упрощения изучения китайского.
       </ThemedText>
       <View style={styles.exampleCard}>
-        <ThemedText style={styles.exampleHanzi}>&#20320;&#22909;</ThemedText>
-        <ThemedText style={styles.examplePinyin}>n&#464; h&#462;o</ThemedText>
+        <ThemedText style={styles.exampleTarget}>&#20320;&#22909;</ThemedText>
+        <ThemedText style={styles.exampleTransliteration}>n&#464; h&#462;o</ThemedText>
         <ThemedText style={styles.exampleMeaning}>Привет</ThemedText>
       </View>
       <ThemedText style={styles.body}>
@@ -221,10 +221,10 @@ function NumbersPage() {
           ["\u56db", "s\u00ec", "4"], ["\u4e94", "w\u01d4", "5"], ["\u516d", "li\u00f9", "6"],
           ["\u4e03", "q\u012b", "7"], ["\u516b", "b\u0101", "8"], ["\u4e5d", "ji\u01d4", "9"],
           ["\u5341", "sh\u00ed", "10"],
-        ].map(([hanzi, pinyin, num]) => (
+        ].map(([target, transliteration, num]) => (
           <View key={num} style={styles.numberCell}>
-            <ThemedText style={styles.numberHanzi}>{hanzi}</ThemedText>
-            <ThemedText style={styles.numberPinyin}>{pinyin}</ThemedText>
+            <ThemedText style={styles.numberTarget}>{target}</ThemedText>
+            <ThemedText style={styles.numberTransliteration}>{transliteration}</ThemedText>
             <ThemedText style={styles.numberNum}>{num}</ThemedText>
           </View>
         ))}
@@ -247,14 +247,14 @@ function PhrasesPage() {
         Вот несколько фраз, которые вы выучите в первых главах:
       </ThemedText>
       <View style={styles.phraseTable}>
-        <PhraseRow hanzi="&#20320;&#22909;" pinyin="n&#464; h&#462;o" meaning="Привет" />
-        <PhraseRow hanzi="&#35874;&#35874;" pinyin="xi&#232;xie" meaning="Спасибо" />
-        <PhraseRow hanzi="&#20877;&#35265;" pinyin="z&#224;iji&#224;n" meaning="До свидания" />
-        <PhraseRow hanzi="&#23545;&#19981;&#36215;" pinyin="du&#236;buq&#464;" meaning="Извините" />
-        <PhraseRow hanzi="&#25105;&#21483;..." pinyin="w&#466; ji&#224;o..." meaning="Меня зовут..." />
-        <PhraseRow hanzi="&#20320;&#22909;&#21527;?" pinyin="n&#464; h&#462;o ma?" meaning="Как дела?" />
-        <PhraseRow hanzi="&#24456;&#22909;" pinyin="h&#283;n h&#462;o" meaning="Очень хорошо" />
-        <PhraseRow hanzi="&#25105;&#19981;&#25026;" pinyin="w&#466; b&#249; d&#466;ng" meaning="Я не понимаю" />
+        <PhraseRow target="&#20320;&#22909;" transliteration="n&#464; h&#462;o" meaning="Привет" />
+        <PhraseRow target="&#35874;&#35874;" transliteration="xi&#232;xie" meaning="Спасибо" />
+        <PhraseRow target="&#20877;&#35265;" transliteration="z&#224;iji&#224;n" meaning="До свидания" />
+        <PhraseRow target="&#23545;&#19981;&#36215;" transliteration="du&#236;buq&#464;" meaning="Извините" />
+        <PhraseRow target="&#25105;&#21483;..." transliteration="w&#466; ji&#224;o..." meaning="Меня зовут..." />
+        <PhraseRow target="&#20320;&#22909;&#21527;?" transliteration="n&#464; h&#462;o ma?" meaning="Как дела?" />
+        <PhraseRow target="&#24456;&#22909;" transliteration="h&#283;n h&#462;o" meaning="Очень хорошо" />
+        <PhraseRow target="&#25105;&#19981;&#25026;" transliteration="w&#466; b&#249; d&#466;ng" meaning="Я не понимаю" />
       </View>
     </PageWrapper>
   );
@@ -267,16 +267,16 @@ function WordOrderPage() {
         Китайский язык имеет фиксированный порядок слов: Подлежащее + Сказуемое + Дополнение (как в английском).
       </ThemedText>
       <View style={styles.exampleCard}>
-        <ThemedText style={styles.exampleHanzi}>&#25105; &#21917; &#33590;</ThemedText>
-        <ThemedText style={styles.examplePinyin}>w&#466; h&#275; ch&#225;</ThemedText>
+        <ThemedText style={styles.exampleTarget}>&#25105; &#21917; &#33590;</ThemedText>
+        <ThemedText style={styles.exampleTransliteration}>w&#466; h&#275; ch&#225;</ThemedText>
         <ThemedText style={styles.exampleMeaning}>Я пью чай (Я + пить + чай)</ThemedText>
       </View>
       <ThemedText style={styles.body}>
         Время и место ставятся ПЕРЕД глаголом (не после, как в русском):
       </ThemedText>
       <View style={styles.exampleCard}>
-        <ThemedText style={styles.exampleHanzi}>&#25105; &#26126;&#22825; &#21435; &#21271;&#20140;</ThemedText>
-        <ThemedText style={styles.examplePinyin}>w&#466; m&#237;ngti&#257;n q&#249; B&#283;ij&#299;ng</ThemedText>
+        <ThemedText style={styles.exampleTarget}>&#25105; &#26126;&#22825; &#21435; &#21271;&#20140;</ThemedText>
+        <ThemedText style={styles.exampleTransliteration}>w&#466; m&#237;ngti&#257;n q&#249; B&#283;ij&#299;ng</ThemedText>
         <ThemedText style={styles.exampleMeaning}>Я завтра поеду в Пекин{"\n"}(Я + завтра + ехать + Пекин)</ThemedText>
       </View>
       <ThemedText style={styles.body}>
@@ -329,7 +329,7 @@ const PAGES: { key: string; render: () => React.ReactNode }[] = [
   { key: "what-is", render: () => <WhatIsChinesePage /> },
   { key: "differences", render: () => <DifferencesPage /> },
   { key: "tones", render: () => <TonesPage /> },
-  { key: "pinyin", render: () => <PinyinPage /> },
+  { key: "pinyin", render: () => <TransliterationPage /> },
   { key: "characters", render: () => <CharactersPage /> },
   { key: "numbers", render: () => <NumbersPage /> },
   { key: "phrases", render: () => <PhrasesPage /> },
@@ -530,14 +530,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textSecondary,
   },
-  toneHanzi: {
+  toneTarget: {
     flex: 1,
     fontFamily: FontFamily.bold,
     fontSize: 24,
     textAlign: "center",
     color: Colors.primaryAccentColor,
   },
-  tonePinyin: {
+  toneTransliteration: {
     flex: 1,
     fontFamily: FontFamily.medium,
     fontSize: 15,
@@ -558,12 +558,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryAccentBg,
     marginVertical: 12,
   },
-  exampleHanzi: {
+  exampleTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 36,
     color: Colors.primaryAccentColor,
   },
-  examplePinyin: {
+  exampleTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 17,
     color: Colors.textPrimary,
@@ -589,12 +589,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: Colors.successBg,
   },
-  numberHanzi: {
+  numberTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 22,
     color: Colors.successColor,
   },
-  numberPinyin: {
+  numberTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 11,
     color: Colors.successColorDark,
@@ -620,13 +620,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.divider,
   },
-  phraseHanzi: {
+  phraseTarget: {
     flex: 1,
     fontFamily: FontFamily.bold,
     fontSize: 20,
     color: Colors.primaryAccentColor,
   },
-  phrasePinyin: {
+  phraseTransliteration: {
     flex: 1.2,
     fontFamily: FontFamily.medium,
     fontSize: 13,

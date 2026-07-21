@@ -9,7 +9,7 @@ export default function Flashcard({
   direction,
 }: {
   word: Word;
-  direction: "en-zh" | "zh-en";
+  direction: "translation-first" | "target-first";
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnimation = useRef(new Animated.Value(0)).current;
@@ -51,37 +51,37 @@ export default function Flashcard({
   };
 
   const FrontContent = () => {
-    if (direction === "en-zh") {
+    if (direction === "translation-first") {
       return (
-        <ThemedText style={styles.englishFront}>{word.english}</ThemedText>
+        <ThemedText style={styles.translationFront}>{word.translation}</ThemedText>
       );
     }
 
     return (
-      <View style={styles.mandarinContent}>
-        <ThemedText style={styles.pinyin}>{word.pinyin}</ThemedText>
-        <ThemedText style={styles.hanzi}>{word.hanzi}</ThemedText>
+      <View style={styles.phraseContent}>
+        <ThemedText style={styles.transliteration}>{word.transliteration}</ThemedText>
+        <ThemedText style={styles.target}>{word.target}</ThemedText>
       </View>
     );
   };
 
   const BackContent = () => {
-    if (direction === "en-zh") {
+    if (direction === "translation-first") {
       return (
-        <View style={styles.mandarinContent}>
-          <ThemedText style={[styles.pinyin, styles.mandarinBackText]}>
-            {word.pinyin}
+        <View style={styles.phraseContent}>
+          <ThemedText style={[styles.transliteration, styles.phraseBackText]}>
+            {word.transliteration}
           </ThemedText>
-          <ThemedText style={[styles.hanzi, styles.mandarinBackText]}>
-            {word.hanzi}
+          <ThemedText style={[styles.target, styles.phraseBackText]}>
+            {word.target}
           </ThemedText>
         </View>
       );
     }
 
     return (
-      <ThemedText style={[styles.englishBack, styles.mandarinBackText]}>
-        {word.english}
+      <ThemedText style={[styles.translationBack, styles.phraseBackText]}>
+        {word.translation}
       </ThemedText>
     );
   };
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
   },
-  mandarinContent: {
+  phraseContent: {
     justifyContent: "center",
     alignItems: "center",
     gap: 12,
     width: "100%",
   },
-  pinyin: {
+  transliteration: {
     fontFamily: FontFamily.semibold,
     fontSize: 36,
     lineHeight: 44,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: "90%",
   },
-  hanzi: {
+  target: {
     fontFamily: FontFamily.bold,
     fontSize: 56,
     lineHeight: 64,
@@ -153,10 +153,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: "90%",
   },
-  mandarinBackText: {
+  phraseBackText: {
     color: Colors.textInverse,
   },
-  englishFront: {
+  translationFront: {
     fontFamily: FontFamily.semibold,
     fontSize: 32,
     lineHeight: 40,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: "90%",
   },
-  englishBack: {
+  translationBack: {
     fontFamily: FontFamily.medium,
     fontSize: 30,
     lineHeight: 38,

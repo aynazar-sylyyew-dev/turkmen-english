@@ -122,9 +122,9 @@ export default function MatchPairsMode({
               onPress={() => handleLeftPress(pair.id)}
               disabled={matchedIds.has(pair.id)}
             >
-              <ThemedText style={styles.cardHanzi}>{pair.left}</ThemedText>
-              {pair.leftPinyin && (
-                <ThemedText style={styles.cardPinyin}>{pair.leftPinyin}</ThemedText>
+              <ThemedText style={styles.cardTarget}>{pair.left}</ThemedText>
+              {pair.leftTransliteration && (
+                <ThemedText style={styles.cardTransliteration}>{pair.leftTransliteration}</ThemedText>
               )}
             </Pressable>
           ))}
@@ -138,7 +138,7 @@ export default function MatchPairsMode({
               onPress={() => handleRightPress(pair.id)}
               disabled={matchedIds.has(pair.id)}
             >
-              <ThemedText style={styles.cardEnglish}>{pair.right}</ThemedText>
+              <ThemedText style={styles.cardTranslation}>{pair.right}</ThemedText>
             </Pressable>
           ))}
         </View>
@@ -173,18 +173,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 56,
   },
-  cardHanzi: {
+  cardTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 22,
     color: Colors.primaryAccentColor,
   },
-  cardPinyin: {
+  cardTransliteration: {
     fontFamily: FontFamily.regular,
     fontSize: 12,
     color: Colors.subduedTextColor,
     marginTop: 2,
   },
-  cardEnglish: {
+  cardTranslation: {
     fontFamily: FontFamily.semibold,
     fontSize: 14,
     color: Colors.textPrimary,

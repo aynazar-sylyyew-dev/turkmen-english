@@ -1,7 +1,7 @@
 import { Colors, FontFamily } from "@/constants/theme";
 import { haptics } from "@/lib/haptics";
 import { T } from "@/lib/strings";
-import * as Speech from "expo-speech";
+import { speak } from "@/lib/tts";
 import { useEffect, useState } from "react";
 import {
   Pressable,
@@ -19,13 +19,13 @@ import { ThemedText } from "../themed-text";
 
 interface BlankOption {
   id: number;
-  hanzi: string;
-  pinyin?: string;
+  target: string;
+  transliteration?: string;
 }
 
 export default function FillBlankMode({
   sentence,
-  sentencePinyin,
+  sentenceTransliteration,
   blankedWord,
   correctAnswer,
   hint,
@@ -34,7 +34,8 @@ export default function FillBlankMode({
   onAnswer,
 }: {
   sentence: string;
-  sentencePinyin: string;
+  /** Absent for languages that need no pronunciation aid (e.g. English). */
+  sentenceTransliteration?: string;
   blankedWord: string;
   correctAnswer: string;
   hint?: string;
@@ -64,13 +65,13 @@ export default function FillBlankMode({
   }, [answered, isCorrect]);
 
   const displaySentence = sentence.replace(blankedWord, "______");
-  const displayPinyin = sentencePinyin;
+  const displayTransliteration = sentenceTransliteration;
 
   const handleOptionPress = (opt: BlankOption) => {
     if (answered) return;
     haptics.tap();
     setSelectedId(opt.id);
-    const correct = opt.hanzi === correctAnswer;
+    const correct = opt.target === correctAnswer;
     setIsCorrect(correct);
     setAnswered(true);
   };
@@ -80,7 +81,7 @@ export default function FillBlankMode({
   };
 
   const playAudio = () => {
-    Speech.speak(sentence, { language: "zh-CN" });
+    speak(sentence);
   };
 
   return (
@@ -90,7 +91,7 @@ export default function FillBlankMode({
       <Animated.View style={wiggleStyle}>
         <TouchableOpacity onPress={playAudio} style={styles.sentenceCard} activeOpacity={0.85}>
           <ThemedText style={styles.sentenceText}>{displaySentence}</ThemedText>
-          <ThemedText style={styles.pinyinText}>{displayPinyin}</ThemedText>
+          <ThemedText style={styles.transliterationText}>{displayTransliteration}</ThemedText>
         </TouchableOpacity>
       </Animated.View>
 
@@ -104,7 +105,7 @@ export default function FillBlankMode({
         <View style={styles.optionsGrid}>
           {options.map((opt) => {
             const isSelected = selectedId === opt.id;
-            const isThisCorrect = opt.hanzi === correctAnswer;
+            const isThisCorrect = opt.target === correctAnswer;
 
             let bgColor = Colors.surfacePrimary;
             let borderColor = Colors.borderColor;
@@ -129,9 +130,9 @@ export default function FillBlankMode({
                 onPress={() => handleOptionPress(opt)}
                 disabled={answered}
               >
-                <ThemedText style={styles.optionHanzi}>{opt.hanzi}</ThemedText>
-                {opt.pinyin && (
-                  <ThemedText style={styles.optionPinyin}>{opt.pinyin}</ThemedText>
+                <ThemedText style={styles.optionTarget}>{opt.target}</ThemedText>
+                {opt.transliteration && (
+                  <ThemedText style={styles.optionTransliteration}>{opt.transliteration}</ThemedText>
                 )}
               </Pressable>
             );
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 6,
   },
-  pinyinText: {
+  transliterationText: {
     fontFamily: FontFamily.medium,
     fontSize: 14,
     color: Colors.textSecondary,
@@ -222,13 +223,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  optionHanzi: {
+  optionTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 26,
     color: Colors.primaryAccentColor,
     marginBottom: 4,
   },
-  optionPinyin: {
+  optionTransliteration: {
     fontFamily: FontFamily.regular,
     fontSize: 13,
     color: Colors.subduedTextColor,

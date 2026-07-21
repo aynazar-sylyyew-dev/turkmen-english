@@ -201,7 +201,7 @@ export default function AboutScreen() {
                 Programma MIT lisenziýasy bilen açyk çeşmäni esas alýar.
                 {"\n\n"}
                 Mazmun çeşmeleri: Boya Chinese Elementary I (Peking University
-                Press), Twemoji (CC-BY 4.0), Hanzi Writer (MIT), Inter şrift (OFL).
+                Press), Twemoji (CC-BY 4.0), Inter şrift (OFL).
               </ThemedText>
             </Section>
           </ScrollView>

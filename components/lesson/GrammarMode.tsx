@@ -92,9 +92,9 @@ export default function GrammarMode({
               <ThemedText style={styles.examplesLabel}>{T.practice.examples}</ThemedText>
               {rule.examples.map((example, idx) => (
                 <View key={idx} style={styles.exampleCard}>
-                  <ThemedText style={styles.exampleHanzi}>{example.hanzi}</ThemedText>
-                  <ThemedText style={styles.examplePinyin}>{example.pinyin}</ThemedText>
-                  <ThemedText style={styles.exampleEnglish}>{example.english}</ThemedText>
+                  <ThemedText style={styles.exampleTarget}>{example.target}</ThemedText>
+                  <ThemedText style={styles.exampleTransliteration}>{example.transliteration}</ThemedText>
+                  <ThemedText style={styles.exampleTranslation}>{example.translation}</ThemedText>
                 </View>
               ))}
             </View>
@@ -206,19 +206,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryAccentBg,
     marginBottom: 10,
   },
-  exampleHanzi: {
+  exampleTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 20,
     color: Colors.primaryAccentColor,
     marginBottom: 4,
   },
-  examplePinyin: {
+  exampleTransliteration: {
     fontFamily: FontFamily.medium,
     fontSize: 13,
     color: Colors.textPrimary,
     marginBottom: 4,
   },
-  exampleEnglish: {
+  exampleTranslation: {
     fontFamily: FontFamily.regular,
     fontSize: 13,
     color: Colors.subduedTextColor,

@@ -3,15 +3,19 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 
-const APP_ID = "turkmen-chinese";
+const APP_ID = "turkmen-english";
 const BACKUP_VERSION = 1;
 
 // Every AsyncStorage key that holds user progress/state worth backing up.
-const BACKUP_KEYS = [
+// Keep this in sync with the STORAGE_KEY of every lib/ module that persists
+// something — a key missing here is silently dropped on restore.
+export const BACKUP_KEYS = [
   "total_xp",
   "streak_data",
   "bookmarked_chapters",
   "lesson_progress",
+  "step_progress",
+  "exam_results",
   "speaking_listening_stats",
   "user_name",
   "app_settings",
@@ -71,7 +75,7 @@ export async function exportProgress(exportedAt: string): Promise<BackupResult> 
   try {
     const entries = await AsyncStorage.multiGet(BACKUP_KEYS);
     const backup = buildBackup(entries, exportedAt);
-    const fileUri = `${FileSystem.cacheDirectory}turkmen-chinese-backup.json`;
+    const fileUri = `${FileSystem.cacheDirectory}turkmen-english-backup.json`;
     await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(backup, null, 2));
     if (!(await Sharing.isAvailableAsync())) return { ok: false, reason: "error" };
     await Sharing.shareAsync(fileUri, {
