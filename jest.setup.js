@@ -24,6 +24,12 @@ jest.mock("@react-native-async-storage/async-storage", () => {
       multiGet: jest.fn((keys) =>
         Promise.resolve(keys.map((k) => [k, Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null])),
       ),
+      multiSet: jest.fn((pairs) => {
+        pairs.forEach(([key, value]) => {
+          store[key] = String(value);
+        });
+        return Promise.resolve();
+      }),
     },
   };
 });

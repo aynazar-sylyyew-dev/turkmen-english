@@ -85,29 +85,35 @@ export const T = {
       multiple_choice: "Saýlama",
       listening_mc: "Diňleme",
       flashcard: "Kartoçka",
-      fill_blank: "Boşluk doldurma",
-      match_pairs: "Jübütleme",
+      // Названия совпадающих типов — из донорского exerciseTypes.
+      fill_blank: "Boşlugy doldur",
+      match_pairs: "Gabat getirmek",
       grammar: "Grammatika",
-      text_choice: "Saýlama",
-      odd_one_out: "Artykmajyny tap",
-      transformation: "Sözlemi üýtget",
+      text_choice: "Wariant saýlamak",
+      odd_one_out: "Artykmajy tapmak",
+      transformation: "Üýtgetmek",
       reading: "Okamak",
     } as Record<string, string>,
   },
 
-  // Упражнения со свободным вводом и шаги без оценки
+  // Упражнения со свободным вводом и шаги без оценки.
+  // Формулировки взяты из донорского src/i18n/tk.ts — там они уже
+  // отшлифованы на живых пользователях английского курса.
   freeText: {
     placeholder: "Jogabyňy ýaz…",
-    listen: "Diňle",
-    correct: "Dogry!",
-    incorrect: "Dogry jogap:",
-    readingPassage: "Tekst",
+    listen: "Diňle we eşideniňi ýaz",
+    correct: "Dogry",
+    incorrect: "Dogry jogap",
+    explanation: "Düşündiriş",
   },
   writing: {
     words: (n: number) => `${n} söz`,
     minWords: (n: number) => `Iň az ${n} söz`,
-    recorded: "Ýazgyň saklandy",
-    notAutoChecked: "Bu gönükme bahalandyrylmaýar — erkin maşk.",
+    recorded: "Ýazyldy",
+    notAutoChecked:
+      "Döredijilik ýumuşlary awtomatik barlanmaýar — bu türgenleşik üçin ýer.",
+    practiceLater:
+      "Bu ýumşa soň dolanyp, ýazuw türgenleşigini edip bilersiň.",
   },
   practice: {
     chooseAnswer: "Jogaby saýla:",

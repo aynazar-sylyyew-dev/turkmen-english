@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { CHAPTER_ILLUSTRATIONS } from "@/constants/ChapterIllustrations";
+import { getChapterVisual } from "@/constants/ChapterVisuals";
 import { COURSE_DATA, isGradedQuestion } from "@/constants/CourseData";
 import { Colors, FontFamily, Radius, Shadow, Spacing } from "@/constants/theme";
 import { useBookmarks } from "@/lib/bookmarks";
@@ -150,7 +150,7 @@ export default function ChapterDetailScreen() {
   const gradedCount = allQuestions.filter(isGradedQuestion).length;
   const theoryCount = allQuestions.filter((q) => q.type === "theory").length;
 
-  const Illustration = CHAPTER_ILLUSTRATIONS[id];
+  const visual = getChapterVisual(id);
 
   const openStep = (step: CourseStep) => {
     haptics.tap();
@@ -217,11 +217,9 @@ export default function ChapterDetailScreen() {
             </ThemedText>
             <ThemedText style={styles.targetTitle}>{chapter.title}</ThemedText>
           </View>
-          {Illustration && (
-            <View style={styles.heroIllustration}>
-              <Illustration width={80} height={80} />
-            </View>
-          )}
+          <View style={[styles.heroVisual, { backgroundColor: visual.bg }]}>
+            <Ionicons name={visual.icon} size={38} color={visual.fg} />
+          </View>
         </View>
 
         {/* Stats row */}
@@ -302,9 +300,10 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   heroLeft: { flex: 1 },
-  heroIllustration: {
+  heroVisual: {
     width: 80,
     height: 80,
+    borderRadius: Radius.lg,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -164,7 +164,7 @@ export default function TextAnswerMode({
                 isCorrect ? styles.textCorrect : styles.textWrong,
               ]}
             >
-              {isCorrect ? T.freeText.correct : T.freeText.incorrect}
+              {isCorrect ? T.freeText.correct : `${T.freeText.incorrect}:`}
             </ThemedText>
             {!isCorrect ? (
               <ThemedText style={styles.feedbackAnswer}>{answer}</ThemedText>

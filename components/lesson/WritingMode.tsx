@@ -104,6 +104,9 @@ export default function WritingMode({
             <ThemedText style={styles.recordedText}>
               {T.writing.notAutoChecked}
             </ThemedText>
+            <ThemedText style={styles.recordedText}>
+              {T.writing.practiceLater}
+            </ThemedText>
           </View>
         ) : null}
       </ScrollView>

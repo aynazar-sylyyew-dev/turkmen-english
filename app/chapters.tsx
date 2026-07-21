@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { CHAPTER_ILLUSTRATIONS } from "@/constants/ChapterIllustrations";
+import { getChapterVisual } from "@/constants/ChapterVisuals";
 import { COURSE_DATA } from "@/constants/CourseData";
 import { Colors, FontFamily, Radius, Shadow, Spacing } from "@/constants/theme";
 import { useBookmarks } from "@/lib/bookmarks";
@@ -102,7 +102,7 @@ export default function ChaptersScreen() {
           const isCompleted = completedChapterIds.has(chapter.id);
           const isCurrent = chapter.id === nextChapterId;
           const isBookmarked = bookmarks.has(chapter.id);
-          const Illustration = CHAPTER_ILLUSTRATIONS[chapter.id];
+          const visual = getChapterVisual(chapter.id);
 
           return (
             <Pressable
@@ -166,11 +166,9 @@ export default function ChaptersScreen() {
                 </ThemedText>
               </View>
 
-              {Illustration && (
-                <View style={styles.illustrationBox}>
-                  <Illustration width={52} height={52} />
-                </View>
-              )}
+              <View style={[styles.visualBadge, { backgroundColor: visual.bg }]}>
+                <Ionicons name={visual.icon} size={26} color={visual.fg} />
+              </View>
             </Pressable>
           );
         })}
@@ -325,11 +323,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     lineHeight: 18,
   },
-  illustrationBox: {
-    width: 72,
+  visualBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 8,
+    marginLeft: 12,
   },
   chapterMeta: {
     fontFamily: FontFamily.regular,
