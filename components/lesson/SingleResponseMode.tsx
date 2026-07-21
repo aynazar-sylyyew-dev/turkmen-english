@@ -64,9 +64,11 @@ export default function SingleResponseMode({
               <ThemedText style={styles.optionDetailsTarget}>
                 {option.phrase.target}
               </ThemedText>
-              <ThemedText style={styles.optionDetailsTransliteration}>
-                {option.phrase.transliteration}
-              </ThemedText>
+              {option.phrase.transliteration ? (
+                <ThemedText style={styles.optionDetailsTransliteration}>
+                  {option.phrase.transliteration}
+                </ThemedText>
+              ) : null}
             </View>
           )}
         </TouchableOpacity>

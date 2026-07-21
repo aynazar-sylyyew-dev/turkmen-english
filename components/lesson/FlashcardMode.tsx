@@ -107,7 +107,9 @@ export default function FlashcardMode({
           <Ionicons name="volume-high" size={22} color={Colors.primaryAccentColor} />
         </TouchableOpacity>
         <ThemedText style={styles.targetText}>{target}</ThemedText>
-        <ThemedText style={styles.transliterationText}>{transliteration}</ThemedText>
+        {transliteration ? (
+          <ThemedText style={styles.transliterationText}>{transliteration}</ThemedText>
+        ) : null}
       </Animated.View>
 
       <ThemedText style={styles.instruction}>{instruction}</ThemedText>
@@ -125,9 +127,9 @@ export default function FlashcardMode({
             disabled={answered}
           >
             <ThemedText style={styles.optionTranslation}>{option.translation}</ThemedText>
-            {answered && (
+            {answered && option.transliteration ? (
               <ThemedText style={styles.optionTransliteration}>{option.transliteration}</ThemedText>
-            )}
+            ) : null}
           </Pressable>
         ))}
       </ScrollView>

@@ -1,5 +1,5 @@
 import { THEORY_DATA } from "@/assets/data/theory_content";
-import { COURSE_DATA } from "@/constants/CourseData";
+import { COURSE_DATA, isGradedQuestion } from "@/constants/CourseData";
 
 // ============================================================
 // Модель ШАГОВ главы (Stepik-редизайн, зерно «вариант B»).
@@ -24,7 +24,7 @@ export type StepSubtype =
   | "exam";
 
 export interface CourseStep {
-  /** Уникальный ключ внутри главы: "intro" | "vocab" | "grammar-0" | "dialogue-1" | "practice" | "exam". */
+  /** Уникальный ключ внутри главы: "intro" | "vocab" | "grammar-0" | "dialogue-1" | "lesson-1.2" | "exam". */
   key: string;
   chapterId: number;
   kind: StepKind;
@@ -33,20 +33,37 @@ export interface CourseStep {
   index: number;
   /** Для grammar/dialogue — индекс секции в массиве (для навигации на нужную страницу). */
   sectionIndex?: number;
-  /** Заголовок контента (для grammar/dialogue); пусто для intro/vocab/practice/exam — UI берёт локализованный лейбл по subtype. */
+  /** Для practice — id урока, чей фид открывает шаг (он же ключ прогресса). */
+  lessonId?: string;
+  /** Заголовок контента (для grammar/dialogue/practice); пусто для intro/vocab/exam — UI берёт локализованный лейбл по subtype. */
   title: string;
 }
 
-/** Сколько всего вопросов в главе (по всем урокам). 0 → у главы нет практики/экзамена. */
+/** Сколько всего вопросов в главе (по всем урокам), включая неоцениваемые шаги. */
 export const getChapterQuestionCount = (chapterId: number): number => {
   const chapter = COURSE_DATA.chapters.find((c) => c.id === chapterId);
   if (!chapter) return 0;
   return chapter.lessons.reduce((sum, l) => sum + l.questions.length, 0);
 };
 
+/**
+ * Сколько в главе ОЦЕНИВАЕМЫХ вопросов — то есть из чего вообще можно собрать
+ * экзамен. Глава из одной теории даёт 0: без этого различия она считалась бы
+ * экзаменуемой, экзамен был бы несдаваемым, а следующая глава — закрытой
+ * навсегда.
+ */
+export const getChapterGradableCount = (chapterId: number): number => {
+  const chapter = COURSE_DATA.chapters.find((c) => c.id === chapterId);
+  if (!chapter) return 0;
+  return chapter.lessons.reduce(
+    (sum, l) => sum + l.questions.filter(isGradedQuestion).length,
+    0,
+  );
+};
+
 /** Есть ли у главы экзамен (а значит, может ли она гейтить следующую). */
 export const isChapterExaminable = (chapterId: number): boolean =>
-  getChapterQuestionCount(chapterId) > 0;
+  getChapterGradableCount(chapterId) > 0;
 
 /** Все id глав курса по возрастанию. */
 export const getOrderedChapterIds = (): number[] =>
@@ -54,9 +71,12 @@ export const getOrderedChapterIds = (): number[] =>
 
 /**
  * Построить линейную ленту шагов главы. Порядок строгий:
- * intro, vocab, grammar[0..], dialogue[0..], practice, exam.
- * Теоретические шаги появляются только если есть соответствующий контент,
- * practice/exam — только если в главе есть вопросы.
+ * intro, vocab, grammar[0..], dialogue[0..], урок[0..], exam.
+ *
+ * Каждый урок главы даёт СВОЙ practice-шаг: у китайского курса на главу
+ * приходится один урок, у английского — четыре, и лента должна одинаково
+ * работать в обоих случаях. Теоретические шаги появляются только если есть
+ * соответствующий контент, экзамен — только если есть что оценивать.
  */
 export const buildChapterSteps = (chapterId: number): CourseStep[] => {
   const steps: CourseStep[] = [];
@@ -91,8 +111,20 @@ export const buildChapterSteps = (chapterId: number): CourseStep[] => {
     );
   }
 
-  if (getChapterQuestionCount(chapterId) > 0) {
-    add({ key: "practice", kind: "practice", subtype: "practice" });
+  const chapter = COURSE_DATA.chapters.find((c) => c.id === chapterId);
+  chapter?.lessons.forEach((lesson) => {
+    if (lesson.questions.length === 0) return;
+    const lessonId = String(lesson.id);
+    add({
+      key: `lesson-${lessonId}`,
+      kind: "practice",
+      subtype: "practice",
+      lessonId,
+      title: chapter.lessons.length > 1 ? lesson.title : "",
+    });
+  });
+
+  if (isChapterExaminable(chapterId)) {
     add({ key: "exam", kind: "exam", subtype: "exam" });
   }
 

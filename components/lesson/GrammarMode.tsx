@@ -93,7 +93,9 @@ export default function GrammarMode({
               {rule.examples.map((example, idx) => (
                 <View key={idx} style={styles.exampleCard}>
                   <ThemedText style={styles.exampleTarget}>{example.target}</ThemedText>
-                  <ThemedText style={styles.exampleTransliteration}>{example.transliteration}</ThemedText>
+                  {example.transliteration ? (
+                    <ThemedText style={styles.exampleTransliteration}>{example.transliteration}</ThemedText>
+                  ) : null}
                   <ThemedText style={styles.exampleTranslation}>{example.translation}</ThemedText>
                 </View>
               ))}

@@ -105,9 +105,11 @@ export function FeedbackView({
               <ThemedText style={styles.correctAnswerTarget}>
                 {correctOption.phrase.target}
               </ThemedText>
-              <ThemedText style={styles.correctAnswerTransliteration}>
-                {correctOption.phrase.transliteration}
-              </ThemedText>
+              {correctOption.phrase.transliteration ? (
+                <ThemedText style={styles.correctAnswerTransliteration}>
+                  {correctOption.phrase.transliteration}
+                </ThemedText>
+              ) : null}
             </View>
           </View>
         </View>

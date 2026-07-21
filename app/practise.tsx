@@ -51,6 +51,24 @@ export default function PractiseScreen() {
   const [mode, setMode] = useState<Mode>("menu");
 
   const { questions, id, words } = useMemo(() => {
+    // A lesson id wins when both are present: a chapter may hold several
+    // lessons, and each is its own feed. chapterId then only says which
+    // chapter's vocabulary to show alongside.
+    if (lessonId) {
+      const allLessons = COURSE_DATA.chapters.flatMap((c) =>
+        c.review ? [...c.lessons, c.review] : c.lessons,
+      );
+      const currentLesson = allLessons.find((l) => String(l.id) === lessonId);
+      const lessonQuestions = currentLesson ? currentLesson.questions : [];
+      return {
+        questions: lessonQuestions,
+        id: lessonId,
+        words: chapterId
+          ? getChapterVocabulary(Number(chapterId))
+          : getUniqueWordsFromQuestions(lessonQuestions),
+      };
+    }
+
     if (chapterId) {
       const chapter = COURSE_DATA.chapters.find(
         (ch) => ch.id === Number(chapterId),
@@ -62,19 +80,6 @@ export default function PractiseScreen() {
         questions: allQuestions,
         id: `chapter-${chapterId}`,
         words: getChapterVocabulary(Number(chapterId)),
-      };
-    }
-
-    if (lessonId) {
-      const allLessons = COURSE_DATA.chapters.flatMap((c) =>
-        c.review ? [...c.lessons, c.review] : c.lessons,
-      );
-      const currentLesson = allLessons.find((l) => l.id === lessonId);
-      const lessonQuestions = currentLesson ? currentLesson.questions : [];
-      return {
-        questions: lessonQuestions,
-        id: lessonId,
-        words: getUniqueWordsFromQuestions(lessonQuestions),
       };
     }
 

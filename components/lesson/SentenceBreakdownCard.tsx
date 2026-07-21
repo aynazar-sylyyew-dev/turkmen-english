@@ -153,6 +153,21 @@ export default function SentenceBreakdownCard({
     });
   };
 
+  const playButton = (
+    <Pressable
+      onPress={playAudio}
+      disabled={disabled}
+      style={styles.playButton}
+      hitSlop={8}
+    >
+      <Ionicons
+        name={isPlaying ? "pause" : "play"}
+        size={20}
+        color={Colors.primaryAccentColor}
+      />
+    </Pressable>
+  );
+
   const renderInteractiveSentence = (type: "target" | "transliteration") => (
     <Pressable onPress={hideTooltip}>
       <View style={styles.interactiveSentenceContainer}>
@@ -229,26 +244,24 @@ export default function SentenceBreakdownCard({
             </ThemedText>
           </View>
 
-          <View style={styles.breakdownItem}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <ThemedText style={styles.label}>Transliteration:</ThemedText>
-              <Pressable
-                onPress={playAudio}
-                disabled={disabled}
-                style={styles.playButton}
-                hitSlop={8}
-              >
-                <Ionicons
-                  name={isPlaying ? "pause" : "play"}
-                  size={20}
-                  color={Colors.primaryAccentColor}
-                />
-              </Pressable>
+          {/* Languages with no pronunciation aid (English) skip the whole
+              transliteration row — otherwise its label sits over an empty
+              block. The play button then rides on the target row instead, so
+              audio never disappears with it. */}
+          {sentence.transliteration ? (
+            <View style={styles.breakdownItem}>
+              <View style={styles.labelRow}>
+                <ThemedText style={styles.label}>Transliteration:</ThemedText>
+                {playButton}
+              </View>
+              {renderInteractiveSentence("transliteration")}
             </View>
-            {renderInteractiveSentence("transliteration")}
-          </View>
+          ) : null}
           <View style={styles.breakdownItem}>
-            <ThemedText style={styles.label}>Target:</ThemedText>
+            <View style={styles.labelRow}>
+              <ThemedText style={styles.label}>Target:</ThemedText>
+              {sentence.transliteration ? null : playButton}
+            </View>
             {renderInteractiveSentence("target")}
           </View>
           <View style={styles.breakdownItem}>
@@ -344,6 +357,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: Colors.textPrimary,
     marginBottom: 5,
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   breakdownItem: { marginBottom: 28 },
   label: {

@@ -88,6 +88,19 @@ export const T = {
   },
 
   // Режимы упражнений (Flashcard / FillBlank / MultipleChoice / Grammar / MatchPairs)
+  // Упражнения со свободным вводом и шаги без оценки
+  freeText: {
+    placeholder: "Jogabyňy ýaz…",
+    correct: "Dogry!",
+    incorrect: "Dogry jogap:",
+    readingPassage: "Tekst",
+  },
+  writing: {
+    words: (n: number) => `${n} söz`,
+    minWords: (n: number) => `Iň az ${n} söz`,
+    recorded: "Ýazgyň saklandy",
+    notAutoChecked: "Bu gönükme bahalandyrylmaýar — erkin maşk.",
+  },
   practice: {
     chooseAnswer: "Jogaby saýla:",
     hintLabel: "Kömek",

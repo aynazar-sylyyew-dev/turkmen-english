@@ -183,7 +183,12 @@ export default function ChapterDetailScreen() {
     if (step.kind === "exam") {
       router.push({ pathname: "/chapter-test", params: { chapterId: String(id) } });
     } else if (step.kind === "practice") {
-      router.push({ pathname: "/practise", params: { chapterId: String(id) } });
+      // chapterId travels alongside so the vocabulary card can still pull the
+      // chapter's word list; the feed itself comes from the lesson.
+      router.push({
+        pathname: "/practise",
+        params: { lessonId: step.lessonId ?? "", chapterId: String(id) },
+      });
     } else {
       router.push({
         pathname: "/theory",

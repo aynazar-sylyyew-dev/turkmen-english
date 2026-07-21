@@ -2,7 +2,7 @@ import ExamResultScreen from "@/components/lesson/ExamResultScreen";
 import LessonContent, { LessonStats } from "@/components/lesson/LessonContent";
 import { ThemedText } from "@/components/themed-text";
 import { CHARACTERS } from "@/constants/CharacterAvatars";
-import { COURSE_DATA, Question } from "@/constants/CourseData";
+import { COURSE_DATA, isGradedQuestion, type Question } from "@/constants/CourseData";
 import { Colors, FontFamily, Spacing } from "@/constants/theme";
 import { ExamResult, saveExamResult } from "@/lib/examResult";
 import { T } from "@/lib/strings";
@@ -60,7 +60,11 @@ export default function ChapterTestScreen() {
     );
     if (!chapter) return { questions: [] as Question[], lessonId: "" };
 
-    const allQuestions = chapter.lessons.flatMap((l) => l.questions);
+    // Theory blocks and free-writing tasks are not answerable, so they can
+    // never be part of an exam — the pool is the graded subset only.
+    const allQuestions = chapter.lessons
+      .flatMap((l) => l.questions)
+      .filter(isGradedQuestion);
     const selected = shuffleArray(allQuestions).slice(0, TEST_QUESTION_COUNT);
 
     return { questions: selected, lessonId: `test-${chapterId}` };

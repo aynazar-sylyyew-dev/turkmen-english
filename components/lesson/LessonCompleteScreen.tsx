@@ -187,9 +187,11 @@ export default function LessonCompleteScreen({
                       {question.translation}
                     </ThemedText>
                     <View style={styles.questionPhrase}>
-                      <ThemedText style={styles.questionTransliteration}>
-                        {question.phrase.transliteration}
-                      </ThemedText>
+                      {question.phrase.transliteration ? (
+                        <ThemedText style={styles.questionTransliteration}>
+                          {question.phrase.transliteration}
+                        </ThemedText>
+                      ) : null}
                       <ThemedText style={styles.questionTarget}>
                         {question.phrase.target}
                       </ThemedText>

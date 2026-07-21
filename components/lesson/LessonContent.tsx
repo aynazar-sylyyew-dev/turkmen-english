@@ -1,4 +1,8 @@
-import { Question, SpeakingOption } from "@/constants/CourseData";
+import {
+  isAudioQuestion,
+  type Question,
+  type SpeakingOption,
+} from "@/constants/CourseData";
 import { Colors } from "@/constants/theme";
 import { haptics } from "@/lib/haptics";
 import { hasCompletedLesson, incrementLessonCompletion } from "@/lib/lessonProgress";
@@ -28,6 +32,10 @@ import FillBlankMode from "./FillBlankMode";
 import FlashcardMode from "./FlashcardMode";
 import GrammarMode from "./GrammarMode";
 import MatchPairsMode from "./MatchPairsMode";
+import OddOneOutMode from "./OddOneOutMode";
+import TextAnswerMode from "./TextAnswerMode";
+import TheoryBlock from "./TheoryBlock";
+import WritingMode from "./WritingMode";
 import ExerciseNavBar from "./ExerciseNavBar";
 
 // LessonStats/TypeBreakdown теперь живут в lib/lessonStats.ts (чистый модуль,
@@ -124,13 +132,10 @@ export default function LessonContent({
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   const selectedSentence = useMemo((): SpeakingOption | null => {
-    // New types handle their own feedback — no selected sentence needed
-    if (
-      currentQuestion.type === "flashcard" ||
-      currentQuestion.type === "fill_blank" ||
-      currentQuestion.type === "match_pairs" ||
-      currentQuestion.type === "grammar"
-    ) {
+    // Only the audio types have a "selected sentence" to feed the breakdown
+    // card. Every other type renders its own feedback, so list the audio types
+    // positively — a negative list silently breaks each time a type is added.
+    if (!isAudioQuestion(currentQuestion)) {
       return null;
     }
 
@@ -259,12 +264,7 @@ export default function LessonContent({
   };
 
   const playAudio = () => {
-    if (
-      currentQuestion.type === "flashcard" ||
-      currentQuestion.type === "fill_blank" ||
-      currentQuestion.type === "match_pairs" ||
-      currentQuestion.type === "grammar"
-    ) {
+    if (!isAudioQuestion(currentQuestion)) {
       return;
     }
     const textToSpeak =
@@ -403,6 +403,16 @@ export default function LessonContent({
       haptics.error();
       setWrongQuestions((prev) => new Set(prev).add(currentQuestion.id));
     }
+    nextQuestion();
+  };
+
+  // Non-graded steps (theory blocks, free writing) are walked through, not
+  // answered. This handler deliberately touches none of the scoring state —
+  // reaching for handleSelfContainedAnswer(true) "just to advance" is exactly
+  // what would silently inflate the score.
+  const handleNonGradedContinue = () => {
+    haptics.tap();
+    void markActiveDay();
     nextQuestion();
   };
 
@@ -565,6 +575,67 @@ export default function LessonContent({
           rule={currentQuestion.rule}
           practice={currentQuestion.practice}
           onAnswer={handleSelfContainedAnswer}
+        />
+      )}
+
+      {/* Typed-answer types */}
+      {currentQuestion.type === "transformation" && (
+        <TextAnswerMode
+          key={currentQuestion.id}
+          instruction={currentQuestion.instruction}
+          passage={currentQuestion.input}
+          answer={currentQuestion.answer}
+          acceptableAnswers={currentQuestion.acceptableAnswers}
+          hint={currentQuestion.hint}
+          explanation={currentQuestion.explanation}
+          onAnswer={handleSelfContainedAnswer}
+        />
+      )}
+
+      {currentQuestion.type === "reading" && (
+        <TextAnswerMode
+          key={currentQuestion.id}
+          instruction={currentQuestion.prompt}
+          passage={currentQuestion.text}
+          answer={currentQuestion.answer}
+          acceptableAnswers={currentQuestion.acceptableAnswers}
+          hint={currentQuestion.hint}
+          explanation={currentQuestion.explanation}
+          onAnswer={handleSelfContainedAnswer}
+        />
+      )}
+
+      {currentQuestion.type === "odd_one_out" && (
+        <OddOneOutMode
+          key={currentQuestion.id}
+          prompt={currentQuestion.prompt}
+          options={currentQuestion.options}
+          correctIndex={currentQuestion.correctIndex}
+          explanation={currentQuestion.explanation}
+          onAnswer={handleSelfContainedAnswer}
+        />
+      )}
+
+      {/* Non-graded steps — note they take onContinue, never onAnswer */}
+      {currentQuestion.type === "theory" && (
+        <TheoryBlock
+          key={currentQuestion.id}
+          title={currentQuestion.title}
+          body={currentQuestion.body}
+          examples={currentQuestion.examples}
+          emoji={currentQuestion.emoji}
+          onContinue={handleNonGradedContinue}
+        />
+      )}
+
+      {currentQuestion.type === "writing" && (
+        <WritingMode
+          key={currentQuestion.id}
+          prompt={currentQuestion.prompt}
+          minWords={currentQuestion.minWords}
+          placeholder={currentQuestion.placeholder}
+          hint={currentQuestion.hint}
+          onContinue={handleNonGradedContinue}
         />
       )}
 

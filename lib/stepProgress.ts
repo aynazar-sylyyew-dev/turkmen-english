@@ -38,7 +38,12 @@ export interface StepWithState {
  */
 export const computeStepStates = (
   steps: CourseStep[],
-  flags: { theoryDone: Set<string>; practiceDone: boolean; examPassed: boolean },
+  flags: {
+    theoryDone: Set<string>;
+    /** id уроков, чьи фиды пройдены — по одному practice-шагу на урок. */
+    practiceDone: Set<string>;
+    examPassed: boolean;
+  },
 ): StepWithState[] => {
   let currentAssigned = false;
   return steps.map((step) => {
@@ -46,7 +51,7 @@ export const computeStepStates = (
       step.kind === "exam"
         ? flags.examPassed
         : step.kind === "practice"
-          ? flags.practiceDone
+          ? flags.practiceDone.has(step.lessonId ?? step.key)
           : flags.theoryDone.has(step.key);
 
     let state: StepState;
@@ -143,11 +148,15 @@ export const getChapterStepStates = async (
   chapterId: number,
 ): Promise<ChapterStepStates> => {
   const steps = buildChapterSteps(chapterId);
-  const [theoryDone, practiceDone, examResults] = await Promise.all([
+  const lessonIds = steps
+    .filter((s) => s.kind === "practice")
+    .map((s) => s.lessonId ?? s.key);
+  const [theoryDone, practiceFlags, examResults] = await Promise.all([
     getTheoryStepsDone(chapterId),
-    hasCompletedLesson(`chapter-${chapterId}`),
+    Promise.all(lessonIds.map((id) => hasCompletedLesson(id))),
     getAllExamResults(),
   ]);
+  const practiceDone = new Set(lessonIds.filter((_, i) => practiceFlags[i]));
   const examPassed = examResults[chapterId]?.passed ?? false;
 
   const withState = computeStepStates(steps, {
@@ -181,20 +190,26 @@ export const getCourseUnlocks = async (): Promise<ChapterUnlock[]> => {
     readAll(),
     getAllExamResults(),
   ]);
-  // lessonProgress (практика) читаем единым проходом ниже через hasCompletedLesson,
-  // но чтобы не дёргать его в цикле, соберём практику параллельно.
-  const practiceDoneFlags = await Promise.all(
-    ids.map((id) => hasCompletedLesson(`chapter-${id}`)),
+
+  // Одна глава может нести несколько уроков, поэтому собираем плоский список
+  // всех practice-шагов курса и читаем их прогресс одним параллельным заходом.
+  const chapterSteps = ids.map((id) => buildChapterSteps(id));
+  const lessonIdsByChapter = chapterSteps.map((steps) =>
+    steps.filter((s) => s.kind === "practice").map((s) => s.lessonId ?? s.key),
   );
+  const flatLessonIds = lessonIdsByChapter.flat();
+  const flatFlags = await Promise.all(
+    flatLessonIds.map((lessonId) => hasCompletedLesson(lessonId)),
+  );
+  const practiceDone = new Set(flatLessonIds.filter((_, i) => flatFlags[i]));
 
   const examinable = ids.map((id) => isChapterExaminable(id));
   const passed = ids.map((id) => examResults[id]?.passed ?? false);
 
   return ids.map((chapterId, i) => {
-    const steps = buildChapterSteps(chapterId);
-    const withState = computeStepStates(steps, {
+    const withState = computeStepStates(chapterSteps[i], {
       theoryDone: new Set(allTheory[chapterId] ?? []),
-      practiceDone: practiceDoneFlags[i],
+      practiceDone,
       examPassed: passed[i],
     });
     return {

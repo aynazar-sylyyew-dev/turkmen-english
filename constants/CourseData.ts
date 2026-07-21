@@ -170,6 +170,66 @@ interface GrammarQuestion extends BaseQuestion {
   practice: GrammarPractice[];
 }
 
+// --- Free-text types ---
+// The learner types an answer; it is matched with lib/grading.ts, which folds
+// case, apostrophes and trailing punctuation before comparing. `answer` is
+// always accepted, `acceptableAnswers` only widens what else passes.
+
+interface TransformationQuestion extends BaseQuestion {
+  type: "transformation";
+  /** What to do with the sentence, e.g. "Make it negative". */
+  instruction: string;
+  /** The sentence to transform. */
+  input: string;
+  answer: string;
+  acceptableAnswers?: string[];
+  hint?: string;
+  explanation?: string;
+}
+
+interface ReadingQuestion extends BaseQuestion {
+  type: "reading";
+  /** The passage to read. */
+  text: string;
+  /** The question asked about the passage. */
+  prompt: string;
+  answer: string;
+  acceptableAnswers?: string[];
+  hint?: string;
+  explanation?: string;
+}
+
+interface OddOneOutQuestion extends BaseQuestion {
+  type: "odd_one_out";
+  prompt: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+}
+
+// --- Non-graded steps ---
+// Steps the learner passes through rather than answers. They are navigable and
+// must be completed, but they never reach the score, the accuracy, the XP or
+// the exam pool. See `isGradedQuestion` below — that predicate, not the type
+// name, is what every counter must ask.
+
+interface TheoryQuestion extends BaseQuestion {
+  type: "theory";
+  title?: string;
+  body: string;
+  examples?: string[];
+  emoji?: string;
+}
+
+interface WritingQuestion extends BaseQuestion {
+  type: "writing";
+  prompt: string;
+  /** Words required before the step can be completed. Defaults to 1. */
+  minWords?: number;
+  placeholder?: string;
+  hint?: string;
+}
+
 export type Question =
   | MultipleChoiceQuestion
   | SingleResponseQuestion
@@ -177,6 +237,46 @@ export type Question =
   | FlashcardQuestion
   | FillBlankQuestion
   | MatchPairsQuestion
-  | GrammarQuestion;
+  | GrammarQuestion
+  | TransformationQuestion
+  | ReadingQuestion
+  | OddOneOutQuestion
+  | TheoryQuestion
+  | WritingQuestion;
+
+/**
+ * The types whose prompt is spoken aloud and therefore carry a `phrase`.
+ * Everything else renders and grades itself.
+ */
+export type AudioQuestion =
+  | MultipleChoiceQuestion
+  | SingleResponseQuestion
+  | ListeningMultipleChoiceQuestion;
+
+export function isAudioQuestion(question: Question): question is AudioQuestion {
+  return (
+    question.type === "multiple_choice" ||
+    question.type === "single_response" ||
+    question.type === "listening_mc"
+  );
+}
+
+/** Question types that carry no score. Everything else is graded. */
+const NON_GRADED_TYPES: ReadonlySet<Question["type"]> = new Set([
+  "theory",
+  "writing",
+] satisfies Question["type"][]);
+
+/**
+ * Whether a step counts toward score, accuracy, XP and the exam pool.
+ *
+ * Every denominator that means "how well did you do" must filter on this.
+ * Counters that mean "how far along are you" — the progress bar, the n/N
+ * label, the nav-bar circles — must NOT: the learner still walks through
+ * non-graded steps.
+ */
+export function isGradedQuestion(question: Question): boolean {
+  return !NON_GRADED_TYPES.has(question.type);
+}
 
 export const COURSE_DATA = courseData as unknown as CourseData;

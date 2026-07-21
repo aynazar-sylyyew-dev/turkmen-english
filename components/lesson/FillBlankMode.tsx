@@ -91,7 +91,9 @@ export default function FillBlankMode({
       <Animated.View style={wiggleStyle}>
         <TouchableOpacity onPress={playAudio} style={styles.sentenceCard} activeOpacity={0.85}>
           <ThemedText style={styles.sentenceText}>{displaySentence}</ThemedText>
-          <ThemedText style={styles.transliterationText}>{displayTransliteration}</ThemedText>
+          {displayTransliteration ? (
+            <ThemedText style={styles.transliterationText}>{displayTransliteration}</ThemedText>
+          ) : null}
         </TouchableOpacity>
       </Animated.View>
 

@@ -1,4 +1,4 @@
-import type { Question } from "@/constants/CourseData";
+import { isGradedQuestion, type Question } from "@/constants/CourseData";
 import { T } from "@/lib/strings";
 
 export interface WrongQuestion {
@@ -39,10 +39,22 @@ export function computeLessonStats(
   wrongQuestions: Set<number>,
   questionAttempts: Record<number, number>,
 ): LessonStats {
-  const accuracy = Math.round((correctAnswersCount / questions.length) * 100);
+  // Theory and writing steps are walked through, not answered — they must not
+  // dilute the score. Everything below counts only the graded subset; the
+  // caller keeps passing the full list because the wrong-answer review still
+  // needs to look questions up by id.
+  const graded = questions.filter(isGradedQuestion);
+
+  // Guard the 0/0 case explicitly: a lesson of pure theory would otherwise
+  // produce NaN, which React Native renders as the literal text "NaN%" and as
+  // a zero-width progress bar without ever throwing.
+  const accuracy =
+    graded.length > 0
+      ? Math.round((correctAnswersCount / graded.length) * 100)
+      : 0;
 
   const wrongQuestionsList = questions
-    .filter((q) => wrongQuestions.has(q.id))
+    .filter((q) => isGradedQuestion(q) && wrongQuestions.has(q.id))
     .map((q) => {
       let translation = "";
       let target = "";
@@ -89,10 +101,13 @@ export function computeLessonStats(
 
   // First-try metrics — a question counts as passed only if it was never wrong
   // (not in wrongQuestions). This is the honest score for the exam and the
-  // basis for the per-type breakdown.
-  const firstTryCorrect = questions.length - wrongQuestions.size;
+  // basis for the per-type breakdown. Both sides of the subtraction are graded
+  // -only, otherwise the count goes negative and the exam records a permanent
+  // fail.
+  const firstTryCorrect =
+    graded.length - graded.filter((q) => wrongQuestions.has(q.id)).length;
   const typeAgg: Record<string, { correct: number; total: number }> = {};
-  questions.forEach((q) => {
+  graded.forEach((q) => {
     const agg = (typeAgg[q.type] ??= { correct: 0, total: 0 });
     agg.total += 1;
     if (!wrongQuestions.has(q.id)) agg.correct += 1;
@@ -105,7 +120,7 @@ export function computeLessonStats(
 
   return {
     correctAnswers: correctAnswersCount,
-    totalQuestions: questions.length,
+    totalQuestions: graded.length,
     accuracy,
     wrongQuestions:
       wrongQuestionsList.length > 0 ? wrongQuestionsList : undefined,

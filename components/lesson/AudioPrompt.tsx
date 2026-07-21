@@ -127,9 +127,11 @@ export default function AudioPrompt({
         ) : showPhrase ? (
           <TouchableOpacity onPress={onRevealPhrase}>
             <Animated.View style={[styles.phraseText, { opacity: fadeAnim }]}>
-              <ThemedText style={styles.transliteration}>
-                {currentQuestion.phrase.transliteration}
-              </ThemedText>
+              {currentQuestion.phrase.transliteration ? (
+                <ThemedText style={styles.transliteration}>
+                  {currentQuestion.phrase.transliteration}
+                </ThemedText>
+              ) : null}
               <ThemedText style={styles.target}>
                 {currentQuestion.phrase.target}
               </ThemedText>
