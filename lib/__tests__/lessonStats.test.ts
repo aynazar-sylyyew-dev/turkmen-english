@@ -4,16 +4,16 @@ import { computeLessonStats } from "@/lib/lessonStats";
 const flashcard = (id: number): Question => ({
   id,
   type: "flashcard",
-  phrase: { target: "好", transliteration: "hǎo" },
+  phrase: { target: "cats" },
   instruction: "Saýla",
-  options: [{ id: 1, translation: "good", target: "好", transliteration: "hǎo" }],
+  options: [{ id: 1, translation: "pişikler", target: "cats" }],
   correctOptionId: 1,
 });
 
 const grammar = (id: number): Question => ({
   id,
   type: "grammar",
-  rule: { title: "是-jümle", explanation: "", examples: [] },
+  rule: { title: "Present simple", explanation: "", examples: [] },
   practice: [],
 });
 
@@ -21,7 +21,7 @@ const matchPairs = (id: number): Question => ({
   id,
   type: "match_pairs",
   instruction: "Baglaň",
-  pairs: [{ id: 1, left: "好", right: "good" }],
+  pairs: [{ id: 1, left: "cat", right: "pişik" }],
 });
 
 const theory = (id: number): Question => ({
@@ -63,8 +63,8 @@ describe("computeLessonStats", () => {
     expect(stats.firstTryCorrect).toBe(2); // 3 total − 1 wrong
     expect(stats.wrongQuestions).toEqual([
       {
-        translation: "good",
-        phrase: { target: "好", transliteration: "hǎo" },
+        translation: "pişikler",
+        phrase: { target: "cats" },
         attempts: 3,
       },
     ]);

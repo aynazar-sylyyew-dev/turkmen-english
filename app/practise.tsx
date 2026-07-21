@@ -112,24 +112,27 @@ export default function PractiseScreen() {
             Nireden başlamak isleýärsiňiz?
           </ThemedText>
 
-          <TouchableOpacity
-            style={styles.menuCard}
-            activeOpacity={0.85}
-            onPress={() => setMode("vocabulary")}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: Colors.primaryAccentBg }]}>
-              <Ionicons name="library-outline" size={24} color={Colors.primaryAccentColor} />
-            </View>
-            <View style={styles.menuCardContent}>
-              <ThemedText style={styles.menuCardTitle}>Sapagyň sözleri</ThemedText>
-              <ThemedText style={styles.menuCardSubtitle}>
-                {words.length > 0
-                  ? `${words.length} sözi gaýtala`
-                  : "Sözleri gaýtala"}
-              </ThemedText>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.subduedTextColor} />
-          </TouchableOpacity>
+          {/* Only offered when the course actually ships a word list for the
+              chapter — courses that teach through the lesson feed alone have
+              none, and an empty vocabulary screen is a dead end. */}
+          {words.length > 0 && (
+            <TouchableOpacity
+              style={styles.menuCard}
+              activeOpacity={0.85}
+              onPress={() => setMode("vocabulary")}
+            >
+              <View style={[styles.menuIcon, { backgroundColor: Colors.primaryAccentBg }]}>
+                <Ionicons name="library-outline" size={24} color={Colors.primaryAccentColor} />
+              </View>
+              <View style={styles.menuCardContent}>
+                <ThemedText style={styles.menuCardTitle}>Sapagyň sözleri</ThemedText>
+                <ThemedText style={styles.menuCardSubtitle}>
+                  {`${words.length} sözi gaýtala`}
+                </ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={Colors.subduedTextColor} />
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={styles.menuCard}

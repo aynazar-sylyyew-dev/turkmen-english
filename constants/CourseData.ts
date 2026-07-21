@@ -27,6 +27,7 @@ interface PhrasebookEntry {
 export interface Chapter {
   id: number;
   title: string;
+  description?: string;
   lessons: Lesson[];
   review?: Lesson;
 }
@@ -34,8 +35,8 @@ export interface Chapter {
 export interface Lesson {
   id: string;
   title: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  completionCount: number;
+  description?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
   questions: Question[];
 }
 
@@ -121,12 +122,21 @@ interface FillBlankOption {
 
 interface FillBlankQuestion extends BaseQuestion {
   type: "fill_blank";
-  sentence: string;
-  sentenceTransliteration?: string;
-  blankedWord: string;
-  correctAnswer: string;
-  hint?: string;
   instruction: string;
+  /** The sentence carrying the gap. Absent when the instruction states it. */
+  sentence?: string;
+  sentenceTransliteration?: string;
+  blankedWord?: string;
+  correctAnswer: string;
+  /** Extra spellings accepted alongside `correctAnswer` when typed. */
+  acceptableAnswers?: string[];
+  hint?: string;
+  explanation?: string;
+  /**
+   * When present the learner taps one of these; when absent they type the
+   * answer. Languages differ here: the Chinese course offers characters to
+   * pick from, the English one expects the word to be written out.
+   */
   options?: FillBlankOption[];
 }
 
@@ -199,6 +209,20 @@ interface ReadingQuestion extends BaseQuestion {
   explanation?: string;
 }
 
+/**
+ * Pick one of several plain-text options. Two discriminants share this shape
+ * so the exam breakdown can tell them apart — `text_choice` is an ordinary
+ * "which is correct", `odd_one_out` is "which does not belong" — but they
+ * render through the same component.
+ */
+interface TextChoiceQuestion extends BaseQuestion {
+  type: "text_choice";
+  prompt: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+}
+
 interface OddOneOutQuestion extends BaseQuestion {
   type: "odd_one_out";
   prompt: string;
@@ -218,6 +242,8 @@ interface TheoryQuestion extends BaseQuestion {
   title?: string;
   body: string;
   examples?: string[];
+  /** An aside — an exception, a caveat, a "watch out for this". */
+  note?: string;
   emoji?: string;
 }
 
@@ -240,6 +266,7 @@ export type Question =
   | GrammarQuestion
   | TransformationQuestion
   | ReadingQuestion
+  | TextChoiceQuestion
   | OddOneOutQuestion
   | TheoryQuestion
   | WritingQuestion;
@@ -279,4 +306,14 @@ export function isGradedQuestion(question: Question): boolean {
   return !NON_GRADED_TYPES.has(question.type);
 }
 
+/**
+ * The cast is unavoidable, not lazy: TypeScript widens every string in an
+ * imported JSON module to `string`, so `type: "reading"` never satisfies the
+ * `"reading"` literal a discriminated union needs. No annotation can fix that.
+ *
+ * The safety it costs is bought back elsewhere — scripts/convert-english-content.js
+ * validates the data as it is generated, and lib/__tests__/courseData.test.ts
+ * asserts that every shipped question really carries the fields its declared
+ * type promises.
+ */
 export const COURSE_DATA = courseData as unknown as CourseData;

@@ -118,7 +118,9 @@ export default function ChaptersScreen() {
             .filter((ch) => ch.id >= unit.range[0] && ch.id <= unit.range[1])
             .filter((ch) => !showBookmarksOnly || bookmarks.has(ch.id));
 
-          if (showBookmarksOnly && chaptersInUnit.length === 0) return null;
+          // A course shorter than the unit ranges leaves trailing sections
+          // empty — render nothing rather than a bare heading.
+          if (chaptersInUnit.length === 0) return null;
 
           const completedInUnit = chaptersInUnit.filter((ch) =>
             completedChapterIds.has(ch.id),

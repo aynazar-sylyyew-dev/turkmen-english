@@ -84,10 +84,13 @@ export const T = {
       fill_blank: "Boşluk doldurma",
       match_pairs: "Jübütleme",
       grammar: "Grammatika",
+      text_choice: "Saýlama",
+      odd_one_out: "Artykmajyny tap",
+      transformation: "Sözlemi üýtget",
+      reading: "Okamak",
     } as Record<string, string>,
   },
 
-  // Режимы упражнений (Flashcard / FillBlank / MultipleChoice / Grammar / MatchPairs)
   // Упражнения со свободным вводом и шаги без оценки
   freeText: {
     placeholder: "Jogabyňy ýaz…",

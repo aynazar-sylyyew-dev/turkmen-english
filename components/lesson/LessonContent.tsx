@@ -546,19 +546,33 @@ export default function LessonContent({
         />
       )}
 
-      {currentQuestion.type === "fill_blank" && (
-        <FillBlankMode
-          key={currentQuestion.id}
-          sentence={currentQuestion.sentence}
-          sentenceTransliteration={currentQuestion.sentenceTransliteration}
-          blankedWord={currentQuestion.blankedWord}
-          correctAnswer={currentQuestion.correctAnswer}
-          hint={currentQuestion.hint}
-          instruction={currentQuestion.instruction}
-          options={currentQuestion.options}
-          onAnswer={handleSelfContainedAnswer}
-        />
-      )}
+      {/* Gap-fill comes in two flavours: pick one of the offered options, or
+          type the word. Which one is decided by the content, not the app. */}
+      {currentQuestion.type === "fill_blank" &&
+        (currentQuestion.options && currentQuestion.options.length > 0 ? (
+          <FillBlankMode
+            key={currentQuestion.id}
+            sentence={currentQuestion.sentence ?? ""}
+            sentenceTransliteration={currentQuestion.sentenceTransliteration}
+            blankedWord={currentQuestion.blankedWord ?? ""}
+            correctAnswer={currentQuestion.correctAnswer}
+            hint={currentQuestion.hint}
+            instruction={currentQuestion.instruction}
+            options={currentQuestion.options}
+            onAnswer={handleSelfContainedAnswer}
+          />
+        ) : (
+          <TextAnswerMode
+            key={currentQuestion.id}
+            instruction={currentQuestion.instruction}
+            passage={currentQuestion.sentence}
+            answer={currentQuestion.correctAnswer}
+            acceptableAnswers={currentQuestion.acceptableAnswers}
+            hint={currentQuestion.hint}
+            explanation={currentQuestion.explanation}
+            onAnswer={handleSelfContainedAnswer}
+          />
+        ))}
 
       {currentQuestion.type === "match_pairs" && (
         <MatchPairsMode
@@ -605,7 +619,8 @@ export default function LessonContent({
         />
       )}
 
-      {currentQuestion.type === "odd_one_out" && (
+      {(currentQuestion.type === "odd_one_out" ||
+        currentQuestion.type === "text_choice") && (
         <OddOneOutMode
           key={currentQuestion.id}
           prompt={currentQuestion.prompt}

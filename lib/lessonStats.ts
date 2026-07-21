@@ -5,7 +5,8 @@ export interface WrongQuestion {
   translation: string;
   phrase: {
     target: string;
-    transliteration: string;
+    /** Omitted for languages that need no pronunciation aid. */
+    transliteration?: string;
   };
   attempts: number;
 }
@@ -77,7 +78,7 @@ export function computeLessonStats(
         transliteration = q.phrase.transliteration ?? "";
       } else if (q.type === "fill_blank") {
         translation = q.correctAnswer;
-        target = q.sentence;
+        target = q.sentence ?? q.instruction;
         transliteration = q.sentenceTransliteration ?? "";
       } else if (q.type === "match_pairs") {
         translation = T.screen.matchPairsLabel;
@@ -87,14 +88,23 @@ export function computeLessonStats(
         translation = q.rule.title;
         target = "";
         transliteration = "";
+      } else if (q.type === "transformation") {
+        translation = q.answer;
+        target = q.input;
+        transliteration = "";
+      } else if (q.type === "reading") {
+        translation = q.answer;
+        target = q.prompt;
+        transliteration = "";
+      } else if (q.type === "text_choice" || q.type === "odd_one_out") {
+        translation = q.options[q.correctIndex] ?? "";
+        target = q.prompt;
+        transliteration = "";
       }
 
       return {
         translation,
-        phrase: {
-          target,
-          transliteration,
-        },
+        phrase: transliteration ? { target, transliteration } : { target },
         attempts: questionAttempts[q.id] || 1,
       };
     });

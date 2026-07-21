@@ -22,7 +22,10 @@ export default function MatchPairsMode({
 }) {
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
   const [selectedRight, setSelectedRight] = useState<number | null>(null);
-  const [matchedIds, setMatchedIds] = useState<Set<number>>(new Set());
+  // Two sets, not one: a left card may legitimately pair with a right card
+  // belonging to a different entry when their texts are identical.
+  const [matchedLeft, setMatchedLeft] = useState<Set<number>>(new Set());
+  const [matchedRight, setMatchedRight] = useState<Set<number>>(new Set());
   const [wrongPair, setWrongPair] = useState<{ left: number; right: number } | null>(null);
   const [mistakes, setMistakes] = useState(0);
 
@@ -33,16 +36,16 @@ export default function MatchPairsMode({
   }, [pairs]);
 
   useEffect(() => {
-    if (matchedIds.size === pairs.length && pairs.length > 0) {
+    if (matchedLeft.size === pairs.length && pairs.length > 0) {
       const timer = setTimeout(() => {
         onAnswer(mistakes === 0);
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [matchedIds, pairs.length, mistakes, onAnswer]);
+  }, [matchedLeft, pairs.length, mistakes, onAnswer]);
 
   const handleLeftPress = (id: number) => {
-    if (matchedIds.has(id)) return;
+    if (matchedLeft.has(id)) return;
     setSelectedLeft(id);
     setWrongPair(null);
 
@@ -52,7 +55,7 @@ export default function MatchPairsMode({
   };
 
   const handleRightPress = (id: number) => {
-    if (matchedIds.has(id)) return;
+    if (matchedRight.has(id)) return;
     setSelectedRight(id);
     setWrongPair(null);
 
@@ -62,9 +65,17 @@ export default function MatchPairsMode({
   };
 
   const checkMatch = (leftId: number, rightId: number) => {
-    if (leftId === rightId) {
+    // Compare the VALUES, not the ids. Content deliberately repeats a right
+    // side to contrast forms ("I → work", "he → works"), and two cards showing
+    // the same word must be interchangeable — otherwise a visually correct
+    // choice is scored as a mistake.
+    const left = pairs.find((p) => p.id === leftId);
+    const right = pairs.find((p) => p.id === rightId);
+
+    if (left && right && left.right === right.right) {
       haptics.success();
-      setMatchedIds((prev) => new Set(prev).add(leftId));
+      setMatchedLeft((prev) => new Set(prev).add(leftId));
+      setMatchedRight((prev) => new Set(prev).add(rightId));
       setSelectedLeft(null);
       setSelectedRight(null);
     } else {
@@ -83,7 +94,8 @@ export default function MatchPairsMode({
   };
 
   const getCardStyle = (id: number, side: "left" | "right") => {
-    const isMatched = matchedIds.has(id);
+    const isMatched =
+      side === "left" ? matchedLeft.has(id) : matchedRight.has(id);
     const isWrong = side === "left" ? wrongPair?.left === id : wrongPair?.right === id;
     const isSelected = side === "left" ? selectedLeft === id : selectedRight === id;
 
@@ -120,7 +132,7 @@ export default function MatchPairsMode({
               key={`left-${pair.id}`}
               style={[styles.card, getCardStyle(pair.id, "left")]}
               onPress={() => handleLeftPress(pair.id)}
-              disabled={matchedIds.has(pair.id)}
+              disabled={matchedLeft.has(pair.id)}
             >
               <ThemedText style={styles.cardTarget}>{pair.left}</ThemedText>
               {pair.leftTransliteration && (
@@ -136,7 +148,7 @@ export default function MatchPairsMode({
               key={`right-${pair.id}`}
               style={[styles.card, getCardStyle(pair.id, "right")]}
               onPress={() => handleRightPress(pair.id)}
-              disabled={matchedIds.has(pair.id)}
+              disabled={matchedRight.has(pair.id)}
             >
               <ThemedText style={styles.cardTranslation}>{pair.right}</ThemedText>
             </Pressable>
@@ -146,7 +158,7 @@ export default function MatchPairsMode({
 
       <View style={styles.progressContainer}>
         <ThemedText style={styles.progressText}>
-          {T.practice.matched(matchedIds.size, pairs.length)}
+          {T.practice.matched(matchedLeft.size, pairs.length)}
         </ThemedText>
       </View>
     </View>
