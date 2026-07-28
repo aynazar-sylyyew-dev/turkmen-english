@@ -103,17 +103,26 @@ export default function ChaptersScreen() {
           const isCurrent = chapter.id === nextChapterId;
           const isBookmarked = bookmarks.has(chapter.id);
           const visual = getChapterVisual(chapter.id);
+          // A chapter stays locked until the previous chapter's exam is passed.
+          // The unlock map may still be loading (empty) — treat unknown as open
+          // so nothing flashes locked on the first frame.
+          const unlock = courseMap.find((c) => c.chapterId === chapter.id);
+          const isLocked = unlock ? !unlock.unlocked : false;
 
           return (
             <Pressable
               key={chapter.id}
+              disabled={isLocked}
+              accessibilityState={{ disabled: isLocked }}
               style={({ pressed }) => [
                 styles.chapterCard,
                 isCurrent && styles.chapterCardCurrent,
                 isCompleted && styles.chapterCardCompleted,
+                isLocked && styles.chapterCardLocked,
                 pressed && styles.cardPressed,
               ]}
               onPress={() => {
+                if (isLocked) return;
                 haptics.tap();
                 router.push({
                   pathname: "/chapter-detail",
@@ -166,8 +175,17 @@ export default function ChaptersScreen() {
                 </ThemedText>
               </View>
 
-              <View style={[styles.visualBadge, { backgroundColor: visual.bg }]}>
-                <Ionicons name={visual.icon} size={26} color={visual.fg} />
+              <View
+                style={[
+                  styles.visualBadge,
+                  { backgroundColor: isLocked ? Colors.surfaceTertiary : visual.bg },
+                ]}
+              >
+                <Ionicons
+                  name={isLocked ? "lock-closed" : visual.icon}
+                  size={26}
+                  color={isLocked ? Colors.subduedTextColor : visual.fg}
+                />
               </View>
             </Pressable>
           );
@@ -262,6 +280,9 @@ const styles = StyleSheet.create({
   },
   chapterCardCompleted: {
     backgroundColor: Colors.surfaceSecondary,
+  },
+  chapterCardLocked: {
+    opacity: 0.55,
   },
   cardPressed: {
     opacity: 0.85,

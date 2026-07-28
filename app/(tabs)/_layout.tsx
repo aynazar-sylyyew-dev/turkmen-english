@@ -1,9 +1,16 @@
 import { Colors, FontFamily } from "@/constants/theme";
+import { useOnboardingState } from "@/lib/onboarding";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React from "react";
 
 export default function TabLayout() {
+  // Cold start anchors on "(tabs)", so a not-yet-onboarded user would land here
+  // straight past the redirect in index.tsx. Gate the tabs too.
+  const { onboarded } = useOnboardingState();
+  if (onboarded === null) return null;
+  if (!onboarded) return <Redirect href="/onboarding" />;
+
   return (
     <Tabs
       screenOptions={{

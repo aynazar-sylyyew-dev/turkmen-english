@@ -207,7 +207,7 @@ export default function ProfileScreen() {
             <MenuItem
               icon="settings-outline"
               title="Sazlamalar"
-              subtitle="Hiýeroglif ýazuwy, gatylyk"
+              subtitle="Ýatlatmalar we ätiýaçlyk nusga"
               onPress={() => router.push("/settings")}
             />
             <MenuItem
