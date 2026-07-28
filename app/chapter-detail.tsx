@@ -47,7 +47,12 @@ function StepRow({
         ? styles.circleCurrent
         : styles.circleLocked;
 
-  const label = T.steps.labels[step.subtype] ?? step.subtype;
+  const typeLabel = T.steps.labels[step.subtype] ?? step.subtype;
+  // Lead with the lesson's own name when it has one; the type ("Gönükmeler")
+  // drops to the subtitle so a chapter of four practice steps doesn't read as
+  // four identical rows. Steps without a title (exam) keep the type as title.
+  const label = step.title || typeLabel;
+  const subLabel = step.title ? typeLabel : null;
 
   return (
     <View style={styles.stepRow}>
@@ -99,9 +104,9 @@ function StepRow({
           >
             {label}
           </ThemedText>
-          {step.title ? (
+          {subLabel ? (
             <ThemedText style={styles.stepSubtitle} numberOfLines={1}>
-              {step.title}
+              {subLabel}
             </ThemedText>
           ) : null}
         </View>

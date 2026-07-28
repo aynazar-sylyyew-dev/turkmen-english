@@ -48,7 +48,7 @@ export default function PractiseScreen() {
     lessonId?: string;
     chapterId?: string;
   }>();
-  const [mode, setMode] = useState<Mode>("menu");
+  const [mode, setMode] = useState<Mode | null>(null);
 
   const { questions, id, words } = useMemo(() => {
     // A lesson id wins when both are present: a chapter may hold several
@@ -86,6 +86,13 @@ export default function PractiseScreen() {
     return { questions: [], id: "", words: [] };
   }, [chapterId, lessonId]);
 
+  // The word-list card is the only reason the chooser exists. Without it the
+  // menu is a single "go to exercises" button — and returning to it after the
+  // lesson is a dead end — so skip straight to the exercises instead.
+  const hasVocab = words.length > 0;
+  const effectiveMode: Mode = mode ?? (hasVocab ? "menu" : "exercises");
+  const leaveExercises = () => (hasVocab ? setMode("menu") : router.back());
+
   if (questions.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
@@ -103,7 +110,7 @@ export default function PractiseScreen() {
     );
   }
 
-  if (mode === "menu") {
+  if (effectiveMode === "menu") {
     return (
       <SafeAreaView style={styles.container}>
         <BackHeader title="Gönükmeler" />
@@ -155,7 +162,7 @@ export default function PractiseScreen() {
     );
   }
 
-  if (mode === "vocabulary") {
+  if (effectiveMode === "vocabulary") {
     return (
       <SafeAreaView style={styles.container}>
         <VocabularyIntroScreen
@@ -173,7 +180,7 @@ export default function PractiseScreen() {
       <LessonContent
         questions={questions}
         lessonId={id}
-        onExit={() => setMode("menu")}
+        onExit={leaveExercises}
       />
     </SafeAreaView>
   );
