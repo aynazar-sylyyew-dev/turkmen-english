@@ -6,7 +6,6 @@
 // он в assets/data/* и туркменизируется командой переводчиков отдельно.
 //
 // 👉 Команде переводчиков: правьте значения только в этом файле.
-//    Туркменские формулировки ниже — рабочая версия, требует вычитки носителем.
 // ============================================================
 
 export const T = {
@@ -14,21 +13,21 @@ export const T = {
     continue: "Dowam et",
     next: "Indiki",
     check: "Barla",
-    skip: "Geç",
+    skip: "Geçir",
   },
 
   // Экран обратной связи после ответа (FeedbackView)
   feedback: {
     correct: "Berekella!",
-    notQuite: "Az galdy",
-    keepPractising: "Maşk et",
-    tryAgainSub: "Ýene synan — başararsyň!",
+    notQuite: "Az-maz ýetmedi",
+    keepPractising: "Türgenleşmegi dowam et",
+    tryAgainSub: "Ýene synanyş — başararsyň!",
     nextTimeSub: "Indiki gezek şeýle aýt",
-    expected: "Garaşylýan",
-    youSaid: "Sen aýtdyň",
+    expected: "Garaşylýan jogap",
+    youSaid: "Siziň aýdanyňyz",
     correctResponse: "Dogry jogap",
     nextQuestion: "Indiki sorag",
-    tryAgainLeft: (n: number) => `Ýene synan (${n} galdy)`,
+    tryAgainLeft: (n: number) => `Ýene synanyş (${n} qaldy)`,
   },
 
   // Экран завершения урока (LessonCompleteScreen)
@@ -37,14 +36,14 @@ export const T = {
     perfExcellent: "Ajaýyp!", // ≥90%
     perfGreat: "Örän gowy!", // ≥75%
     perfGood: "Gowy!", // ≥60%
-    perfKeep: "Maşk etmegi dowam et!", // <60%
+    perfKeep: "Türgenleşmegi dowam et!", // <60%
     correctCount: (correct: number, total: number) => `${correct}/${total} dogry`,
     inThisLesson: "BU SAPAKDA",
     correctAnswers: (n: number) => `${n} dogry jogap`,
     lessonComplete: "Sapak tamamlandy",
     bonus100: "⭐ 100% bonus",
-    reviewTitle: "Gaýtala",
-    reviewSubtitle: "Şu soraglara üns ber",
+    reviewTitle: "Gaýtalamak",
+    reviewSubtitle: "Şu soraglara üns beriň",
     reviewMistakes: "Ýalňyşlary gaýtala",
   },
 
@@ -57,51 +56,49 @@ export const T = {
     // Лейблы по subtype шага (lookup: T.steps.labels[step.subtype])
     labels: {
       intro: "Giriş",
-      vocab: "Sözler",
+      vocab: "Sözlük",
       grammar: "Grammatika",
       dialogue: "Dialog",
       practice: "Gönükmeler",
       exam: "Bap synagy",
     } as Record<string, string>,
     progress: (done: number, total: number) => `${done} / ${total} ädim`,
-    locked: "Ýapyk",
+    locked: "Gulp arkasynda",
   },
 
   // Экзамен главы (Bap synagy) — экран результата с порогом 70%
   exam: {
     passedTitle: "Synag tabşyryldy!",
-    failedTitle: "Synag geçilmedi",
-    passedMessage: "Indiki baba geçip bilersiň.",
-    failedMessage: "Geçmek üçin azyndan 70% gerek. Gaýtadan synanyş.",
+    failedTitle: "Synagdan geçmediňiz",
+    passedMessage: "Indiki baba geçip bilersiňiz.",
+    failedMessage: "Geçmek üçin azyndan 70% toplanyňyz gerek. Gaýtadan synanyşyň.",
     scoreLabel: (correct: number, total: number) => `${correct}/${total} dogry`,
-    thresholdNote: "Geçmek üçin 70% gerek",
-    breakdownTitle: "Görnüşler boýunça",
+    thresholdNote: "Geçiş baly: 70%",
+    breakdownTitle: "Bölümler boýunça netijeler",
     bestScore: (pct: number) => `Iň gowy netije: ${pct}%`,
     retake: "Gaýtadan synanyş",
-    passBadge: "Geçdiň",
+    passBadge: "Geçdiňiz",
     // Названия типов упражнений для разбивки в результатах
     types: {
       single_response: "Gepleýiş",
-      multiple_choice: "Saýlama",
-      listening_mc: "Diňleme",
+      multiple_choice: "Köp opsiýaly saýlaw",
+      listening_mc: "Diňlemek",
       flashcard: "Kartoçka",
       // Названия совпадающих типов — из донорского exerciseTypes.
-      fill_blank: "Boşlugy doldur",
-      match_pairs: "Gabat getirmek",
+      fill_blank: "Boşlugy doldurmak",
+      match_pairs: "Jübütleri deňleşdirmek",
       grammar: "Grammatika",
       text_choice: "Wariant saýlamak",
       odd_one_out: "Artykmajy tapmak",
-      transformation: "Üýtgetmek",
+      transformation: "Sözlemi өwürmek",
       reading: "Okamak",
     } as Record<string, string>,
   },
 
   // Упражнения со свободным вводом и шаги без оценки.
-  // Формулировки взяты из донорского src/i18n/tk.ts — там они уже
-  // отшлифованы на живых пользователях английского курса.
   freeText: {
-    placeholder: "Jogabyňy ýaz…",
-    listen: "Diňle we eşideniňi ýaz",
+    placeholder: "Jogabyňyzy ýazyň…",
+    listen: "Diňläň we eşideniňizi ýazyň",
     correct: "Dogry",
     incorrect: "Dogry jogap",
     explanation: "Düşündiriş",
@@ -111,15 +108,15 @@ export const T = {
     minWords: (n: number) => `Iň az ${n} söz`,
     recorded: "Ýazyldy",
     notAutoChecked:
-      "Döredijilik ýumuşlary awtomatik barlanmaýar — bu türgenleşik üçin ýer.",
+      "Döredijilikli ýumuşlar awtomatik barlanmaýar — bu diňe türgenleşik üçindir.",
     practiceLater:
-      "Bu ýumşa soň dolanyp, ýazuw türgenleşigini edip bilersiň.",
+      "Bu ýumşa soň dolanyp, ýazuw maşklaryny dowam etdirip bilersiňiz.",
   },
   practice: {
-    chooseAnswer: "Jogaby saýla:",
-    hintLabel: "Kömek",
+    chooseAnswer: "Dogry jogaby saýlaň:",
+    hintLabel: "Kömekçi bilgi",
     examples: "Mysallar",
-    startPractice: (n: number) => `Maşk (${n} sorag)`,
+    startPractice: (n: number) => `Türgenleşmek (${n} sorag)`,
     questionProgress: (current: number, total: number) => `${current} / ${total} sorag`,
     matched: (matched: number, total: number) => `${matched} / ${total} jübütlendi`,
   },
@@ -127,9 +124,9 @@ export const T = {
   // Заголовки и состояния экранов
   screen: {
     theoryTitle: "Teoriýa",
-    theoryPlaceholder: "Teoriýa ýakyn wagtda goşular.",
+    theoryPlaceholder: "Teoriýa bölümi ýakyn wagtda goşular.",
     chapterNotFound: "Bap tapylmady",
-    matchPairsLabel: "Jübütleri birikdir",
+    matchPairsLabel: "Jübütleri birleşdiriň",
     vocabularyTitle: "Sözlük",
   },
 
@@ -141,75 +138,76 @@ export const T = {
 
   // Запись произношения (LessonContent) — фича в плане на доработку
   speaking: {
-    micPermissionTitle: "Mikrofon rugsady",
-    micPermissionBody: "Gepleýşi maşk etmek üçin mikrofon gerek.",
+    micPermissionTitle: "Mikrofona ygtyýar beriň",
+    micPermissionBody: "Gepleýşi türgenleşdirmek üçin mikrofon rugsady gerek.",
     recordingErrorTitle: "Ýazgy ýalňyşlygy",
     couldNotStart: "Ýazgyny başladyp bolmady.",
-    noAudio: "Ses ýazga alynmady.",
+    noAudio: "Ses ýazgysy alynmady.",
     couldNotProcess: "Ýazgyny işläp bolmady.",
     analyzing: "Aýdylyş barlanýar...",
   },
 
   // Упражнение на произношение — режим «повтори вслух» (shadowing)
   shadowing: {
-    prompt: "Diňläp, bu jümläni gaýtalaň",
+    prompt: "Diňläň we bu sözlemi gaýtalaň",
     reveal: "Aýdylyşyny görmek üçin basyň",
   },
 
   // Аудио-подсказка перед аудио-вопросами (AudioPrompt)
   audioPrompt: {
-    tapToListen: "Diňlemek üçin oýnat düwmesine bas",
-    playsOnce: "Ses her jogapdan öň bir gezek çalynýar",
+    tapToListen: "Diňlemek üçin oýnatmak düwmesine basyň",
+    playsOnce: "Ses her jogapdan öň bir gezek diňledilýär",
     listening: "Diňlenýär...",
-    revealWhatSaid: "Näme aýdylanyny görmek üçin şu ýere bas",
+    revealWhatSaid: "Näme aýdylanyny görmek üçin bu ýere basyň",
   },
 
   // Аудирование — «что ты услышал?» (ListeningMultipleChoiceMode)
   listening: {
-    whatDidYouHear: "Näme eşitdiň?",
+    whatDidYouHear: "Näme eşitdiňiz?",
   },
 
   // Разбор предложения по словам (SentenceBreakdownCard)
   breakdown: {
     title: "Sözlem derňewi",
-    tapWordForMeaning: "Manysyny görmek üçin islendik söze bas",
+    tapWordForMeaning: "Manysyny görmek üçin islendik söze basyň",
     breakdownLabel: "Derňew:",
     targetLabel: "Sözlem:",
     transliterationLabel: "Aýdylyşy:",
     translationLabel: "Terjimesi:",
-    swipeForHelp: "Doly kömek üçin ýokary süýşür",
+    swipeForHelp: "Doly kömek almak üçin ýokary süýşürüň",
   },
 
   // Диалог подтверждения выхода из упражнения (ConfirmDialog в LessonContent)
   exitLesson: {
     title: "Gönükmeden çykmak",
-    message: "Hakykatdan hem çykmak isleýärsiňizmi? Öňegidişligiňiz ýatdan çykar.",
+    message: "Hakykatdan hem çykmak isleýärsiňizmi? Öňegidişligiňiz saklanmaz.",
     stay: "Ýok",
-    leave: "Çyk",
+    leave: "Çykmak",
   },
 
   // Локальный бэкап прогресса (экспорт/импорт в файл)
   backup: {
-    exportTitle: "Maglumatlary ýatda sakla",
-    exportSubtitle: "XP, streak we öňegidişligi faýla göçür",
-    importTitle: "Maglumatlary dikelt",
-    importSubtitle: "Ýatda saklanan faýldan yzyna ýükle",
-    importDone: "Dikeldildi. Programmany täzeden açyň.",
-    failed: "Bir zat ýalňyş gitdi. Gaýtadan synanyşyň.",
+    exportTitle: "Maglumatlary ýatda saklaň",
+    exportSubtitle: "XP, strik we öňegidişligi faýla göçüriň",
+    importTitle: "Maglumatlary dikeldiň",
+    importSubtitle: "Ýatda saklanan faýldan yzyna ýüklemek",
+    importDone: "Dikeldi. Programmany täzeden açyň.",
+    failed: "Bir ýalňyşlyk ýüze çykdy. Gaýtadan synanyşyň.",
   },
 
   // Локальные пуш-напоминания о streak
   notifications: {
     reminderTitle: "Streagyňy ýitirme! 🔥",
-    reminderBody: "Şu gün iňlis dilini birazajyk maşk et.",
+
+    reminderBody: "Şu gün iňlis dilini birazajyk türgenleşdiriň.",
   },
 
   // Подписи для скринридеров (accessibilityLabel) на icon-only кнопках
   a11y: {
-    back: "Yza gaýt",
-    exit: "Çyk",
-    playAudio: "Diňle",
-    addBookmark: "Bellige goş",
-    removeBookmark: "Belligi aýyr",
+    back: "Yza",
+    exit: "Çykmak",
+    playAudio: "Diňlemek",
+    addBookmark: "Xatyrada saklamak",
+    removeBookmark: "Belligi aýyrmak",
   },
 };
