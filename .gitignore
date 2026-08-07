@@ -47,3 +47,9 @@ app-example
 
 # source materials (kept locally, not in repo)
 source-materials/
+
+# IDE
+.idea/
+
+# локальные заметки, в репозиторий не идут
+HANDOFF.md
