@@ -9,7 +9,7 @@ Paket: `com.turkmenlearn.english`.
 - **20 bap**, **80 sapak** (her babda 4), **1163 öwreniş ädimi** bolan kurs.
 - Sekiz tabşyryk görnüşi: teoriýa, boş ýeri doldurmak, birnäçe wariantdan saýlamak, artykmajyny tapmak, okamak, jübütleri gabat getirmek, sözlemi özgertmek we erkin ýazmak.
 - Babyň ahyryndaky synag: 15 sorag, **70%** geçiş çägi, "sticky" geçiş (şowsuz gaýta tabşyryk öň geçilen synagy ýatyranok).
-- Bap gulpary: indiki bap diňe öňki babyň synagyndan geçeniňizden soň açylýar.
+- Bap gulplary: indiki bap diňe öňki babyň synagyndan geçeniňizden soň açylýar.
 - Ösüş: XP, yzygiderli günler, tamamlanma sanawlary.
 - Diňlemek tabşyryklary üçin `expo-speech` arkaly text-to-speech.
 - Sazlamalardan ösüşiň ätiýaçlyk nusgasyny eksport/import etmek.
