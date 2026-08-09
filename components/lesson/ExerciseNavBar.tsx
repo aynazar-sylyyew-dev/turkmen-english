@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.successColor,
   },
   circleWrong: {
-    backgroundColor: Colors.primaryAccentColor,
-    borderColor: Colors.primaryAccentColor,
+    backgroundColor: Colors.errorColor,
+    borderColor: Colors.errorColor,
   },
   number: {
     fontFamily: FontFamily.semibold,

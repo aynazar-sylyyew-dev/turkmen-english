@@ -273,8 +273,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.successBg,
   },
   inputWrong: {
-    borderColor: Colors.primaryAccentColor,
-    backgroundColor: Colors.primaryAccentBg,
+    borderColor: Colors.errorColor,
+    backgroundColor: Colors.errorBg,
   },
   hintContainer: {
     backgroundColor: Colors.warningBg,
@@ -294,14 +294,14 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
   },
   feedbackCorrect: { backgroundColor: Colors.successBg },
-  feedbackWrong: { backgroundColor: Colors.primaryAccentBg },
+  feedbackWrong: { backgroundColor: Colors.errorBg },
   feedbackTitle: {
     fontFamily: FontFamily.semibold,
     fontSize: 15,
     marginBottom: 4,
   },
   textCorrect: { color: Colors.successColor },
-  textWrong: { color: Colors.primaryAccentColor },
+  textWrong: { color: Colors.errorColor },
   feedbackAnswer: {
     fontFamily: FontFamily.bold,
     fontSize: 17,

@@ -5,6 +5,12 @@ const RED_600 = "#991B1B";
 const RED_50 = "#FEF2F2";
 const RED_100 = "#FEE2E2";
 
+// Бренд — тёмно-синий британской таблички с иконки (#012169).
+const NAVY_500 = "#012169";
+const NAVY_600 = "#01184B";
+const NAVY_50 = "#EEF2FA";
+const NAVY_100 = "#DCE3F2";
+
 const GREEN_500 = "#00853E";
 const GREEN_600 = "#006B30";
 const GREEN_50 = "#ECFDF5";
@@ -23,6 +29,7 @@ const AMBER_50 = "#FFFBEB";
 
 export const Palette = {
   red: { 50: RED_50, 100: RED_100, 500: RED_500, 600: RED_600 },
+  navy: { 50: NAVY_50, 100: NAVY_100, 500: NAVY_500, 600: NAVY_600 },
   green: { 50: GREEN_50, 100: GREEN_100, 500: GREEN_500, 600: GREEN_600 },
   slate: {
     50: SLATE_50,
@@ -39,10 +46,17 @@ export const Palette = {
 };
 
 export const Colors = {
-  primaryAccentColor: RED_500,
-  primaryAccentColorDark: RED_600,
-  primaryAccentBg: RED_50,
-  primaryAccentBgStrong: RED_100,
+  primaryAccentColor: NAVY_500,
+  primaryAccentColorDark: NAVY_600,
+  primaryAccentBg: NAVY_50,
+  primaryAccentBgStrong: NAVY_100,
+
+  // Ошибка — остаётся красной. Бренд ушёл в синий, но неверный ответ
+  // обязан читаться как ошибка, а не как фирменный цвет.
+  errorColor: RED_500,
+  errorColorDark: RED_600,
+  errorBg: RED_50,
+  errorBgStrong: RED_100,
 
   successColor: GREEN_500,
   successColorDark: GREEN_600,
@@ -68,10 +82,10 @@ export const Colors = {
   light: {
     text: SLATE_900,
     background: "#FFFFFF",
-    tint: RED_500,
+    tint: NAVY_500,
     icon: SLATE_500,
     tabIconDefault: SLATE_500,
-    tabIconSelected: RED_500,
+    tabIconSelected: NAVY_500,
   },
   dark: {
     text: "#ECEDEE",

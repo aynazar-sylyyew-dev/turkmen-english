@@ -72,7 +72,7 @@ export default function GrammarMode({
       return { borderColor: Colors.successColor, backgroundColor: Colors.successBg };
     }
     if (id === selectedId && id !== currentPractice.correctOptionId) {
-      return { borderColor: Colors.primaryAccentColor, backgroundColor: Colors.primaryAccentBg };
+      return { borderColor: Colors.errorColor, backgroundColor: Colors.errorBg };
     }
     return { borderColor: Colors.borderColor, backgroundColor: Colors.surfacePrimary, opacity: 0.5 };
   };

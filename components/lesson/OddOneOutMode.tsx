@@ -78,8 +78,8 @@ export default function OddOneOutMode({
     }
     if (index === selectedIndex) {
       return {
-        borderColor: Colors.primaryAccentColor,
-        backgroundColor: Colors.primaryAccentBg,
+        borderColor: Colors.errorColor,
+        backgroundColor: Colors.errorBg,
       };
     }
     return {

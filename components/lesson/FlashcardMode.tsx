@@ -89,8 +89,8 @@ export default function FlashcardMode({
     }
     if (id === selectedId && id !== correctOptionId) {
       return {
-        borderColor: Colors.primaryAccentColor,
-        backgroundColor: Colors.primaryAccentBg,
+        borderColor: Colors.errorColor,
+        backgroundColor: Colors.errorBg,
       };
     }
     return {

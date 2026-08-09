@@ -107,8 +107,8 @@ export default function MatchPairsMode({
       };
     if (isWrong)
       return {
-        borderColor: Colors.primaryAccentColor,
-        backgroundColor: Colors.primaryAccentBg,
+        borderColor: Colors.errorColor,
+        backgroundColor: Colors.errorBg,
       };
     if (isSelected)
       return {

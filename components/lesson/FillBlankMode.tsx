@@ -117,8 +117,8 @@ export default function FillBlankMode({
                 bgColor = Colors.successBg;
                 borderColor = Colors.successColor;
               } else if (isSelected && !isThisCorrect) {
-                bgColor = Colors.primaryAccentBg;
-                borderColor = Colors.primaryAccentColor;
+                bgColor = Colors.errorBg;
+                borderColor = Colors.errorColor;
               }
             } else if (isSelected) {
               borderColor = Colors.primaryAccentColor;

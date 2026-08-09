@@ -30,8 +30,8 @@ export function FeedbackView({
       style={[
         styles.container,
         {
-          backgroundColor: isCorrect ? Colors.successBg : Colors.primaryAccentBg,
-          borderColor: isCorrect ? Colors.successColor : Colors.primaryAccentColor,
+          backgroundColor: isCorrect ? Colors.successBg : Colors.errorBg,
+          borderColor: isCorrect ? Colors.successColor : Colors.errorColor,
         },
       ]}
     >
@@ -39,7 +39,7 @@ export function FeedbackView({
         <Ionicons
           name={isCorrect ? "checkmark-circle" : "close-circle"}
           size={36}
-          color={isCorrect ? Colors.successColor : Colors.primaryAccentColor}
+          color={isCorrect ? Colors.successColor : Colors.errorColor}
         />
         <View style={styles.headerText}>
           <ThemedText style={styles.title}>
@@ -75,7 +75,7 @@ export function FeedbackView({
             <ThemedText
               style={[
                 styles.transcriptionText,
-                { color: isCorrect ? Colors.successColor : Colors.primaryAccentColor },
+                { color: isCorrect ? Colors.successColor : Colors.errorColor },
               ]}
             >
               {transcription.said.charAt(0).toUpperCase() +
@@ -164,7 +164,7 @@ export function FeedbackView({
                   {
                     backgroundColor:
                       i < attemptCount
-                        ? Colors.primaryAccentColor
+                        ? Colors.errorColor
                         : Colors.borderColorStrong,
                   },
                 ]}
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   correctAnswerTarget: {
     fontFamily: FontFamily.bold,
     fontSize: 20,
-    color: Colors.primaryAccentColor,
+    color: Colors.errorColor,
   },
   correctAnswerTransliteration: {
     fontFamily: FontFamily.medium,

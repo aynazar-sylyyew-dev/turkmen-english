@@ -30,8 +30,8 @@ export default function ExamResultScreen({
   onContinue: () => void;
 }) {
   const passed = result.passed;
-  const accent = passed ? Colors.successColor : Colors.primaryAccentColor;
-  const accentBg = passed ? Colors.successBg : Colors.primaryAccentBg;
+  const accent = passed ? Colors.successColor : Colors.errorColor;
+  const accentBg = passed ? Colors.successBg : Colors.errorBg;
 
   const confettiRef = useRef<any>(null);
   const scaleAnim = useRef(new Animated.Value(0)).current;

@@ -73,7 +73,7 @@ export default function LessonCompleteScreen({
   const getPerformanceColor = () => {
     if (lessonStats.accuracy >= 75) return Colors.successColor;
     if (lessonStats.accuracy >= 60) return Colors.warningColor;
-    return Colors.primaryAccentColor;
+    return Colors.errorColor;
   };
 
   return (
@@ -166,7 +166,7 @@ export default function LessonCompleteScreen({
           lessonStats.wrongQuestions.length > 0 && (
             <Animated.View style={[styles.wrongSection, { opacity: fadeAnim }]}>
               <View style={styles.wrongHeader}>
-                <Ionicons name="alert-circle" size={22} color={Colors.primaryAccentColor} />
+                <Ionicons name="alert-circle" size={22} color={Colors.errorColor} />
                 <ThemedText style={styles.wrongTitle}>{T.complete.reviewTitle}</ThemedText>
               </View>
               <ThemedText style={styles.wrongSubtitle}>
@@ -179,7 +179,7 @@ export default function LessonCompleteScreen({
                     <Ionicons
                       name="close-circle"
                       size={20}
-                      color={Colors.primaryAccentColor}
+                      color={Colors.errorColor}
                     />
                   </View>
                   <View style={styles.questionContent}>
@@ -199,7 +199,7 @@ export default function LessonCompleteScreen({
                   </View>
                   {question.attempts > 0 && (
                     <View style={styles.attemptsIndicator}>
-                      <Ionicons name="refresh" size={14} color={Colors.primaryAccentColor} />
+                      <Ionicons name="refresh" size={14} color={Colors.errorColor} />
                       <ThemedText style={styles.attemptsText}>
                         {question.attempts}
                       </ThemedText>
@@ -453,8 +453,8 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: Colors.primaryAccentBgStrong,
-    backgroundColor: Colors.primaryAccentBg,
+    borderColor: Colors.errorBgStrong,
+    backgroundColor: Colors.errorBg,
     marginBottom: 10,
   },
   wrongIndicator: { marginRight: 10, marginTop: 1 },
