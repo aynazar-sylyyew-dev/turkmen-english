@@ -59,7 +59,7 @@ export default function ExerciseNavBar({
                 style={[
                   styles.number,
                   (isVisited || isWrong) && styles.numberLight,
-                  isCurrent && !isVisited && !isWrong && styles.numberCurrent,
+                  isCurrent && styles.numberCurrent,
                 ]}
               >
                 {i + 1}
